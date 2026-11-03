@@ -129,8 +129,9 @@
       var btn = $('[type=submit]', f); if (btn) btn.disabled = true;
       var data = { name: name, phone: phone, source: f.getAttribute('data-lead-form') };
       if (f.tariff) data.tariff = f.tariff.value;
+      if (f.turnover && f.turnover.value) data.team_size = f.turnover.value;
       sendLead(data).then(function () {
-        toast('Заявка отправлена! Мы свяжемся с вами в ближайшее время.'); f.reset(); closeDialog(); goal('lead'); goal('lead_' + data.source);
+        toast('Заявка отправлена! Мы свяжемся с вами, чтобы уточнить задачу и договориться о консультации.'); f.reset(); closeDialog(); goal('lead'); goal('lead_' + data.source);
       }).catch(function () { toast('Не удалось отправить. Позвоните нам: +7 (927) 424-78-78', true); })
         .then(function () { if (btn) btn.disabled = false; });
     });
@@ -155,14 +156,14 @@
   function renderQuiz(done) {
     var body = $('[data-quiz-body]'); if (!body) return;
     if (done) {
-      body.innerHTML = '<div class="flex flex-col items-center py-8 gap-4"><p class="text-lg font-bold text-foreground text-center">Спасибо! Мы свяжемся с вами.</p><p class="text-sm text-muted-foreground text-center">Наш специалист подберёт оптимальное решение для вашего бизнеса.</p><button data-close-q class="mt-4 inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4">Закрыть</button></div>';
+      body.innerHTML = '<div class="flex flex-col items-center py-8 gap-4"><p class="text-lg font-bold text-foreground text-center">Спасибо! Заявка принята.</p><p class="text-sm text-muted-foreground text-center">Мы свяжемся с вами, уточним задачу и договоримся о видеозвонке с финансовым специалистом.</p><button data-close-q class="mt-4 inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4">Закрыть</button></div>';
       $('[data-close-q]', body).addEventListener('click', closeDialog); return;
     }
     var h = '<div class="flex gap-1 mb-4">' + steps.map(function (s, i) { return '<div class="flex-1 flex flex-col items-center gap-1"><div class="h-1.5 w-full rounded-full ' + (i <= qStep ? 'bg-primary' : 'bg-muted') + '"></div><span class="text-[10px] ' + (i <= qStep ? 'text-primary font-semibold' : 'text-muted-foreground') + '">' + s + '</span></div>'; }).join('') + '</div>';
     if (qStep === 0) h += '<p class="text-sm text-muted-foreground mb-3">В какой нише ваш бизнес?</p><div class="grid grid-cols-2 gap-2">' + Q.niches.map(function (n) { return '<button type="button" data-q="niche" data-v="' + esc(n) + '" class="' + optCls + (qs.niche === n ? on : off) + '">' + esc(n) + '</button>'; }).join('') + '</div>';
     if (qStep === 1) h += '<p class="text-sm text-muted-foreground mb-3">Какой оборот вашего бизнеса?</p><div class="space-y-2">' + Q.turnover.map(function (t) { return '<button type="button" data-q="turnover" data-v="' + esc(t[1]) + '" class="w-full px-4 py-3 ' + optCls + (qs.turnover === t[1] ? on : off) + '">' + esc(t[0]) + '</button>'; }).join('') + '</div>';
     if (qStep === 2) h += '<p class="text-sm text-muted-foreground mb-3">Какие задачи нужно решить? (можно выбрать несколько)</p><div class="space-y-2">' + Q.tasks.map(function (t) { var s = qs.tasks.indexOf(t) >= 0; return '<button type="button" data-q="tasks" data-v="' + esc(t) + '" class="w-full px-4 py-3 ' + optCls + (s ? on : off) + '">' + (s ? '✓ ' : '') + esc(t) + '</button>'; }).join('') + '</div>';
-    if (qStep === 3) h += '<div class="space-y-4"><p class="text-sm text-muted-foreground mb-1">Оставьте контакты — мы проведём бесплатную консультацию</p><input data-qf="name" value="' + esc(qs.name) + '" placeholder="Ваше имя" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm h-12 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><input data-qf="phone" type="tel" value="' + esc(qs.phone) + '" placeholder="+7XXXXXXXXXX" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm h-12 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><p class="text-xs text-muted-foreground">Нажимая кнопку, вы соглашаетесь с <a href="/privacy" class="text-primary hover:underline">политикой обработки персональных данных</a></p></div>';
+    if (qStep === 3) h += '<div class="space-y-4"><p class="text-sm text-muted-foreground mb-1">Оставьте контакты — мы проведём бесплатную консультацию</p><ol class="fp-next fp-next-sm"><li><b>1</b><span>Свяжемся и уточним задачу</span></li><li><b>2</b><span>Видеозвонок с финансовым специалистом</span></li><li><b>3</b><span>Предложим формат работы и стоимость</span></li></ol><input data-qf="name" value="' + esc(qs.name) + '" placeholder="Ваше имя" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm h-12 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><input data-qf="phone" type="tel" value="' + esc(qs.phone) + '" placeholder="+7XXXXXXXXXX" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm h-12 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><p class="text-xs text-muted-foreground">Нажимая кнопку, вы соглашаетесь с <a href="/privacy" class="text-primary hover:underline">политикой обработки персональных данных</a></p></div>';
     h += '<div class="flex gap-3 mt-4">' + (qStep > 0 ? '<button type="button" data-q-back class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4">← Назад</button>' : '') +
       '<button type="button" data-q-next ' + (canNext() ? '' : 'disabled') + ' class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 disabled:opacity-50 disabled:pointer-events-none shadow-lg shadow-primary/25">' + (qStep < 3 ? 'Далее →' : 'Получить консультацию') + '</button></div>';
     body.innerHTML = h;
@@ -182,7 +183,7 @@
     var back = $('[data-q-back]', body); if (back) back.addEventListener('click', function () { qStep--; renderQuiz(); });
     $('[data-q-next]', body).addEventListener('click', function () {
       if (!canNext()) return;
-      if (qStep < 3) { qStep++; renderQuiz(); return; }
+      if (qStep < 3) { qStep++; goal('quiz_step_' + (qStep + 1)); renderQuiz(); return; }
       var btn = this; btn.disabled = true; btn.textContent = 'Отправка...';
       sendLead({ name: qs.name.trim(), phone: normPhone(qs.phone), source: 'quiz', niche: qs.niche, team_size: qs.turnover, tasks: qs.tasks })
         .then(function () { goal('lead'); goal('lead_quiz'); renderQuiz(true); })
@@ -292,4 +293,19 @@
       if (e.target.closest('[data-chat-lead]')) { chat.classList.add('hidden'); $('[data-chat-open]').classList.remove('hidden'); quizReset(); openDialog('quiz'); }
     });
   }
+})();
+
+/* ---------- CRO: клики по контактам и мобильная панель ---------- */
+(function () {
+  var g = function (x) { try { if (window.ym) window.ym(107596992, 'reachGoal', x); } catch (e) {} };
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href]'); if (!a) return;
+    var h = a.getAttribute('href') || '';
+    if (h.indexOf('t.me/') >= 0) g('click_telegram');
+    else if (h.indexOf('wa.me/') >= 0) g('click_whatsapp');
+    else if (h.indexOf('tel:') === 0) g('click_phone');
+  }, true);
+  var bar = document.querySelector('[data-mbar]'); if (!bar) return;
+  var onScroll = function () { var show = window.scrollY > 560; bar.classList.toggle('fp-mbar-on', show); document.body.classList.toggle('fp-mbar-shown', show); };
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
 })();

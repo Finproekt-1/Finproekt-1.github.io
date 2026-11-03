@@ -32,3 +32,17 @@
 .prose th,.prose td{border:1px solid hsl(var(--border));padding:.55em .8em;text-align:left;vertical-align:top}
 .prose thead th{background:hsl(var(--secondary));color:hsl(var(--foreground));font-weight:700}
 .prose td:last-child{white-space:nowrap}
+/* CRO 2026-11: шаги после заявки, выпадающий список, мобильная панель */
+.fp-next{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:8px}
+.fp-next li{display:flex;align-items:center;gap:10px;font-size:.9rem;color:hsl(var(--muted-foreground))}
+.fp-next b{flex:0 0 24px;height:24px;border-radius:999px;background:hsl(var(--primary)/.12);color:hsl(var(--primary));font-size:.75rem;display:flex;align-items:center;justify-content:center}
+.fp-next-sm{margin:4px 0 8px}.fp-next-sm li{font-size:.8rem}
+.fp-select{appearance:auto;padding-top:0;padding-bottom:0}
+.fp-mbar{position:fixed;left:0;right:0;bottom:0;z-index:45;display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:hsl(var(--background)/.96);border-top:1px solid hsl(var(--border));backdrop-filter:blur(6px);transform:translateY(110%);transition:transform .25s ease}
+.fp-mbar.fp-mbar-on{transform:none}
+.fp-mbar button{flex:1;height:44px;border-radius:8px;background:hsl(var(--primary));color:hsl(var(--primary-foreground));font-weight:600;font-size:.95rem}
+.fp-mbar a{flex:0 0 auto;height:44px;padding:0 14px;border-radius:8px;border:1px solid hsl(var(--border));display:flex;align-items:center;gap:6px;font-size:.9rem;color:hsl(var(--foreground))}
+@media (min-width:1024px){.fp-mbar{display:none}}
+@media (max-width:1023px){body.fp-mbar-shown [data-chat-open]{bottom:84px}}
+@media (min-width:1024px){.fp-hero-h1{font-size:2.9rem!important;max-width:660px}}
+@media (min-width:1280px){.fp-hero-h1{font-size:3.05rem!important}}
