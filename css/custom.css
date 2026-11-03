@@ -46,3 +46,34 @@
 @media (max-width:1023px){body.fp-mbar-shown [data-chat-open]{bottom:84px}}
 @media (min-width:1024px){.fp-hero-h1{font-size:2.9rem!important;max-width:660px}}
 @media (min-width:1280px){.fp-hero-h1{font-size:3.05rem!important}}
+/* CRO 2026-11: новые блоки главной (процесс, старт с аудита, FAQ) */
+.fp-sec{padding:64px 0;background:hsl(var(--background))}
+@media (min-width:1024px){.fp-sec{padding:96px 0}}
+.fp-head{text-align:center;max-width:760px;margin:0 auto 40px}
+.fp-head h2{font-size:1.875rem;line-height:1.2;font-weight:700;color:hsl(var(--foreground))}
+@media (min-width:1024px){.fp-head h2{font-size:2.25rem}}
+.fp-head p{margin-top:8px;font-size:1.05rem;color:hsl(var(--muted-foreground))}
+.fp-steps{list-style:none;padding:0;margin:0;display:grid;gap:16px}
+@media (min-width:768px){.fp-steps{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1200px){.fp-steps{grid-template-columns:repeat(4,1fr)}}
+.fp-steps li{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:16px;padding:24px}
+.fp-steps h3{margin-top:14px;font-size:1.05rem;font-weight:700;color:hsl(var(--foreground))}
+.fp-steps p{margin-top:8px;font-size:.92rem;line-height:1.55;color:hsl(var(--muted-foreground))}
+.fp-num{display:inline-flex;width:36px;height:36px;border-radius:10px;align-items:center;justify-content:center;background:hsl(var(--primary)/.12);color:hsl(var(--primary));font-weight:800}
+.fp-center{text-align:center;margin-top:32px}
+.fp-btn{display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 28px;border-radius:8px;background:hsl(var(--primary));color:hsl(var(--primary-foreground));font-weight:600;box-shadow:0 10px 24px -10px hsl(var(--primary)/.6);transition:background .2s}
+.fp-btn:hover{background:hsl(var(--primary)/.9)}
+.fp-start{padding:40px 0 0;background:hsl(var(--background))}
+.fp-start-box{display:flex;flex-direction:column;gap:20px;align-items:flex-start;border:2px solid hsl(var(--primary)/.35);background:hsl(var(--primary)/.06);border-radius:20px;padding:28px}
+@media (min-width:900px){.fp-start-box{flex-direction:row;align-items:center;justify-content:space-between;padding:32px 40px}}
+.fp-start-box h3{font-size:1.4rem;font-weight:800;color:hsl(var(--foreground));margin-top:4px}
+.fp-start-box p{color:hsl(var(--muted-foreground));max-width:640px;margin-top:6px;line-height:1.55}
+.fp-kicker{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:hsl(var(--primary))!important;margin-top:0!important}
+.fp-faq{max-width:820px;margin:0 auto;display:grid;gap:10px}
+.fp-faq details{border:1px solid hsl(var(--border));border-radius:12px;background:hsl(var(--card));padding:0 20px}
+.fp-faq summary{cursor:pointer;list-style:none;padding:18px 28px 18px 0;font-weight:600;color:hsl(var(--foreground));position:relative}
+.fp-faq summary::-webkit-details-marker{display:none}
+.fp-faq summary::after{content:"+";position:absolute;right:0;top:14px;font-size:1.4rem;color:hsl(var(--primary))}
+.fp-faq details[open] summary::after{content:"−"}
+.fp-faq details p{padding:0 0 18px;color:hsl(var(--muted-foreground));line-height:1.6}
+.fp-faq a{color:hsl(var(--primary));text-decoration:underline}

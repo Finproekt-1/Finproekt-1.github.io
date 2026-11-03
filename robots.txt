@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /404.html
+Disallow: /preview/
 
 Sitemap: https://finproekt-1.ru/sitemap.xml
