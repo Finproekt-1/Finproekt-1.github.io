@@ -16,7 +16,8 @@ DIST = os.path.join(ROOT, 'dist')
 site = json.load(open(f'{SRC}/data/site.json'))
 ICONS = json.load(open(f'{SRC}/data/icons.json'))
 MONTHS = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']
-VER = datetime.datetime.now().strftime('%Y%m%d%H%M')
+import hashlib
+VER = hashlib.md5(b''.join(open(f, 'rb').read() for f in sorted(glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', '*', '*.*'))))).hexdigest()[:10]
 
 
 def icon(name, cls=''):
