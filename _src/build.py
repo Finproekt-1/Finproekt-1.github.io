@@ -111,6 +111,10 @@ def build():
     write('/', partial('home_main.html'), site['default_title'], site['default_description'],
           jsonld=[ORG, {"@context": "https://schema.org", "@type": "WebSite", "name": site['name'], "url": site['url']}] + svc_ld)
 
+    # --- preview of the new home structure (noindex, not in sitemap) — until approved
+    if os.path.exists(f'{SRC}/partials/home_preview.html'):
+        write('/preview', partial('home_preview.html'), 'Предпросмотр главной — ФинПроект-1', site['default_description'], robots='noindex, nofollow', sitemap=False)
+
     # --- blog + knowledge base
     posts = []
     for key, sec in SECTIONS.items():
@@ -175,7 +179,7 @@ def build():
         sm.append(f'  <url><loc>{site["url"]}{path}</loc><lastmod>{lm}</lastmod></url>')
     sm.append('</urlset>')
     open(f'{DIST}/sitemap.xml', 'w').write('\n'.join(sm) + '\n')
-    open(f'{DIST}/robots.txt', 'w').write(f'User-agent: *\nAllow: /\nDisallow: /404.html\n\nSitemap: {site["url"]}/sitemap.xml\n')
+    open(f'{DIST}/robots.txt', 'w').write(f'User-agent: *\nAllow: /\nDisallow: /404.html\nDisallow: /preview/\n\nSitemap: {site["url"]}/sitemap.xml\n')
     items = []
     for p in posts[:30]:
         d = datetime.datetime.strptime(p['date'], '%Y-%m-%d').strftime('%a, %d %b %Y 09:00:00 +0300')
