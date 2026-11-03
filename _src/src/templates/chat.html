@@ -1,0 +1,17 @@
+<button data-to-top class="hidden fixed bottom-[5.5rem] right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-muted border border-border text-foreground shadow-md transition-all hover:bg-primary hover:text-primary-foreground" aria-label="Наверх">{{ icon('arrow-up','h-5 w-5') }}</button>
+<button data-chat-open class="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all hover:scale-110" aria-label="Открыть чат">{{ icon('message-circle','h-6 w-6') }}</button>
+<div data-chat class="hidden fixed bottom-0 right-0 z-50 flex h-full w-full flex-col bg-background shadow-2xl sm:bottom-6 sm:right-6 sm:h-[560px] sm:w-[400px] sm:rounded-2xl sm:border sm:border-border">
+  <div class="flex items-center justify-between rounded-t-none bg-primary px-4 py-3 sm:rounded-t-2xl">
+    <div class="flex items-center gap-2">
+      <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-foreground/20 text-sm font-bold text-primary-foreground">ФП</div>
+      <div><p class="text-sm font-semibold text-primary-foreground">ИИ-Консультант</p>
+        <div class="flex items-center gap-1.5"><span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-300 opacity-75"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-green-400"></span></span><p class="text-xs text-primary-foreground/70">онлайн</p></div></div>
+    </div>
+    <button data-chat-close class="text-primary-foreground/80 hover:text-primary-foreground" aria-label="Закрыть чат">{{ icon('x','h-5 w-5') }}</button>
+  </div>
+  <div data-chat-log class="flex-1 overflow-y-auto px-4 py-3 space-y-3"></div>
+  <form data-chat-form class="flex items-end gap-2 border-t border-border px-3 py-3">
+    <textarea data-chat-input placeholder="Напишите сообщение..." rows="1" class="flex-1 resize-none rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring"></textarea>
+    <button type="submit" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40" aria-label="Отправить">{{ icon('send','h-4 w-4') }}</button>
+  </form>
+</div>

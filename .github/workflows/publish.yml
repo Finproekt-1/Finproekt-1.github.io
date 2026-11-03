@@ -1,0 +1,36 @@
+name: Publish scheduled articles
+on:
+  schedule:
+    - cron: '5 3 * * *'   # каждый день в 06:05 по Москве
+  push:
+    branches: [main]
+    paths: ['_src/**', '.github/workflows/publish.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publish
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install markdown jinja2
+      - run: python _src/build.py
+      - name: Copy built site to repository root
+        run: |
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.github' ! -name '_src' -exec rm -rf {} +
+          cp -a _src/dist/. .
+          rm -rf _src/dist
+      - name: Commit if changed
+        run: |
+          git config user.name "finproekt-bot"
+          git config user.email "finproekt-bot@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "nothing to publish"; exit 0; fi
+          git commit -m "Автопубликация $(TZ=Europe/Moscow date +%F)"
+          git push

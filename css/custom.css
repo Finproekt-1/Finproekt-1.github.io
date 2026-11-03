@@ -28,3 +28,7 @@
 .team-card:hover .team-default{opacity:0}
 .team-card:hover img{transform:scale(1.08)}
 .team-marquee-track:hover{animation-play-state:paused}
+.prose table{width:100%;border-collapse:collapse;font-size:.95rem;display:block;overflow-x:auto}
+.prose th,.prose td{border:1px solid hsl(var(--border));padding:.55em .8em;text-align:left;vertical-align:top}
+.prose thead th{background:hsl(var(--secondary));color:hsl(var(--foreground));font-weight:700}
+.prose td:last-child{white-space:nowrap}

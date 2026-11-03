@@ -1,0 +1,47 @@
+<div class="min-h-screen bg-background">
+<section class="relative bg-gradient-to-br from-primary/8 via-background to-primary/4 pt-28 lg:pt-36 pb-14 lg:pb-20 overflow-hidden">
+  <div class="container mx-auto px-4 lg:px-8 relative">
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+      <div class="max-w-2xl">
+        <div class="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-semibold px-4 py-1.5 rounded-full mb-4">{{ icon('target','h-3.5 w-3.5') }}Реальные результаты</div>
+        <h1 class="text-4xl lg:text-5xl font-black text-foreground mb-3 leading-[1.1]">Кейсы <span class="text-primary">наших клиентов</span></h1>
+        <p class="text-muted-foreground text-base lg:text-lg">Каждый кейс — история трансформации бизнеса. Мы находим точки роста и превращаем хаос в систему.</p>
+      </div>
+      <div class="flex gap-6 lg:gap-8">
+        <div class="text-center">{{ icon('target','h-5 w-5 text-primary mx-auto mb-1') }}<div class="text-2xl font-black text-foreground">{{ cases|length }}</div><p class="text-[11px] text-muted-foreground">Кейсов</p></div>
+        <div class="text-center">{{ icon('trending-up','h-5 w-5 text-primary mx-auto mb-1') }}<div class="text-2xl font-black text-foreground">150%</div><p class="text-[11px] text-muted-foreground">Средний рост</p></div>
+        <div class="text-center">{{ icon('chart-column','h-5 w-5 text-primary mx-auto mb-1') }}<div class="text-2xl font-black text-foreground">40ч</div><p class="text-[11px] text-muted-foreground">Экономия/мес</p></div>
+        <div class="text-center">{{ icon('award','h-5 w-5 text-primary mx-auto mb-1') }}<div class="text-2xl font-black text-foreground">{{ niches|length }}</div><p class="text-[11px] text-muted-foreground">Ниш</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="py-4 border-b border-border sticky top-16 lg:top-20 bg-background/95 backdrop-blur-sm z-10">
+  <div class="container mx-auto px-4 lg:px-8"><div class="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+    <button data-filter="" class="px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex items-center gap-1.5 bg-primary text-primary-foreground shadow-md shadow-primary/20">Все<span class="text-xs opacity-70">{{ cases|length }}</span></button>
+    {% for n,c in niches %}<button data-filter="{{ n }}" class="px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex items-center gap-1.5 bg-secondary text-muted-foreground hover:bg-secondary/80 hover:text-foreground">{{ n }}<span class="text-xs opacity-50">{{ c }}</span></button>{% endfor %}
+  </div></div>
+</section>
+<section class="py-10 lg:py-14"><div class="container mx-auto px-4 lg:px-8"><div class="grid md:grid-cols-2 gap-6">
+{% for c in cases %}
+<div data-case-card data-niche="{{ c.niche }}">
+<a class="group relative bg-card rounded-2xl border border-border overflow-hidden flex flex-col h-full hover:shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.25)] hover:-translate-y-1 transition-all duration-500" href="/cases/{{ c.slug }}">
+  <div class="h-1.5 bg-gradient-to-r from-primary via-primary/80 to-primary/40"></div>
+  <div class="p-6 flex flex-col flex-1">
+    <div class="flex items-center gap-2 flex-wrap mb-3">
+      <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 bg-primary/10 text-primary border-primary/20 text-xs font-semibold">{{ c.niche }}</div>
+      {% if c.duration %}<div class="inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold text-foreground gap-1 text-xs">{{ icon('clock','h-3 w-3') }} {{ c.duration }}</div>{% endif %}
+    </div>
+    <h2 class="font-black text-foreground text-xl mb-2 group-hover:text-primary transition-colors leading-tight">{{ c.title }}</h2>
+    <p class="text-sm text-muted-foreground mb-3 line-clamp-2">{{ c.description }}</p>
+    {% if c.problem %}<p class="text-xs text-muted-foreground/70 mb-4 line-clamp-1 italic">Проблема: {{ c.problem }}</p>{% endif %}
+    {% set main = c.main_metric %}
+    {% if main %}<div class="bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl p-4 mb-4 border border-primary/10"><p class="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-medium">{{ main.label }}</p><div class="flex items-center gap-3">{% if main.before %}<span class="text-base font-bold text-muted-foreground/60 line-through">{{ main.before }}</span>{{ icon('zap','h-4 w-4 text-primary') }}{% endif %}<span class="text-2xl font-black text-primary">{{ main.after or main.highlight }}</span></div></div>{% endif %}
+    {% if c.other_metrics %}<div class="grid grid-cols-2 gap-2 mb-4">{% for m in c.other_metrics %}<div class="bg-secondary/50 rounded-lg px-3 py-2"><p class="text-[10px] text-muted-foreground uppercase tracking-wider">{{ m.label }}</p><p class="text-sm font-bold text-foreground">{{ m.after or m.highlight }}</p></div>{% endfor %}</div>{% endif %}
+    <div class="flex items-center gap-1 text-primary text-sm font-semibold mt-auto pt-3 border-t border-border/50">Смотреть кейс {{ icon('arrow-right','h-3.5 w-3.5 group-hover:translate-x-1.5 transition-transform') }}</div>
+  </div>
+</a></div>
+{% endfor %}
+</div></div></section>
+<section class="py-14 bg-gradient-to-r from-primary/10 via-primary/5 to-background"><div class="container mx-auto px-4 lg:px-8 text-center">{{ icon('zap','h-8 w-8 text-primary mx-auto mb-3') }}<h2 class="text-2xl lg:text-3xl font-black text-foreground mb-3">Хотите такие же результаты?</h2><p class="text-muted-foreground mb-6 max-w-md mx-auto text-sm">Обсудим, как применить наш опыт в вашей нише</p><button data-open="quiz" class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-md px-8 shadow-lg shadow-primary/20">Оставить заявку {{ icon('arrow-right','ml-2 h-4 w-4') }}</button></div></section>
+</div>

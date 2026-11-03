@@ -1,0 +1,40 @@
+<div class="min-h-screen bg-background">
+<section class="relative bg-gradient-to-br from-primary/12 via-primary/5 to-background pt-28 lg:pt-36 pb-12 lg:pb-20 overflow-hidden">
+  <div class="container mx-auto px-4 lg:px-8 relative">
+    <nav aria-label="Хлебные крошки" class="mb-6 text-sm text-muted-foreground flex flex-wrap items-center gap-1"><a href="/" class="hover:text-primary transition-colors">Главная</a><span>/</span><a href="/cases" class="hover:text-primary transition-colors">Кейсы</a></nav>
+    <div class="max-w-4xl">
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs bg-primary/10 text-primary border-primary/20 font-semibold">{{ c.niche }}</div>
+        {% if c.duration %}<div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold text-foreground gap-1">{{ icon('clock','h-3 w-3') }} {{ c.duration }}</div>{% endif %}
+      </div>
+      <h1 class="text-3xl lg:text-5xl font-black text-foreground mb-4 leading-[1.1]">{{ c.title }}</h1>
+      <p class="text-lg text-muted-foreground max-w-2xl">{{ c.description }}</p>
+    </div>
+    {% if c.metrics %}<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 max-w-4xl">
+      {% for m in c.metrics %}<div class="bg-card/90 backdrop-blur rounded-xl p-4 border border-border"><p class="text-[11px] text-muted-foreground mb-1 uppercase tracking-wider">{{ m.label }}</p><div class="text-xl lg:text-2xl font-black text-primary">{{ m.highlight or m.after }}</div>{% if m.before %}<p class="text-xs text-muted-foreground mt-1">было: <span class="line-through">{{ m.before }}</span></p>{% endif %}</div>{% endfor %}
+    </div>{% endif %}
+    {% if c.business_info %}<div class="flex flex-wrap gap-6 mt-6 pt-6 border-t border-border/50">
+      {% for k,v in c.business_info.items() %}<div><p class="text-[10px] text-muted-foreground uppercase tracking-wider">{{ k }}</p><p class="font-semibold text-foreground text-sm">{{ v }}</p></div>{% endfor %}
+    </div>{% endif %}
+  </div>
+</section>
+<div class="container mx-auto px-4 lg:px-8 py-10 lg:py-14 max-w-4xl space-y-10">
+  {% if c.problem %}<div class="relative bg-gradient-to-r from-destructive/5 to-destructive/[0.02] rounded-2xl p-6 lg:p-8 border border-destructive/15 overflow-hidden"><div class="absolute left-0 top-0 bottom-0 w-1.5 bg-destructive rounded-l-2xl"></div><div class="flex items-center gap-2 mb-3"><div class="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">{{ icon('circle-alert','h-4 w-4 text-destructive') }}</div><h2 class="text-xl font-black text-foreground">Проблема</h2></div><p class="text-foreground leading-relaxed pl-10">{{ c.problem }}</p></div>{% endif %}
+  {% if c.solution %}<div><div class="flex items-center gap-2 mb-6"><div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">{{ icon('target','h-4 w-4 text-primary') }}</div><h2 class="text-xl font-black text-foreground">Этапы решения</h2></div>
+    <div class="relative pl-10"><div class="absolute left-[15px] top-4 bottom-4 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-primary/10"></div>
+    {% for s in c.solution %}<div class="relative mb-6 last:mb-0"><div class="absolute -left-[25px] top-3 w-7 h-7 rounded-full bg-primary text-primary-foreground text-xs font-black flex items-center justify-center shadow-lg shadow-primary/20 z-10">{{ loop.index }}</div><div class="bg-card rounded-xl p-5 border border-border hover:border-primary/20 hover:shadow-md transition-all duration-300 group"><h3 class="font-bold text-foreground mb-1 group-hover:text-primary transition-colors">{{ s.title }}</h3><p class="text-sm text-muted-foreground">{{ s.description }}</p></div></div>{% endfor %}
+    </div></div>{% endif %}
+  {% if c.results %}<div><div class="flex items-center gap-2 mb-6"><div class="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">{{ icon('circle-check','h-4 w-4 text-green-600') }}</div><h2 class="text-xl font-black text-foreground">Результаты</h2></div>
+    <div class="grid sm:grid-cols-2 gap-3">{% for r in c.results %}<div class="bg-green-500/[0.03] rounded-xl p-4 border border-green-500/10 flex items-start gap-3">{{ icon('circle-check','h-4 w-4 text-green-600 mt-0.5 shrink-0') }}<p class="text-foreground text-sm font-medium">{{ r }}</p></div>{% endfor %}</div></div>{% endif %}
+  {% if c.metrics %}<div class="bg-card rounded-2xl border border-border p-6 lg:p-8"><div class="flex items-center gap-2 mb-6"><div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">{{ icon('trending-up','h-4 w-4 text-primary') }}</div><h2 class="text-xl font-black text-foreground">Ключевые метрики</h2></div>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">{% for m in c.metrics %}<div class="bg-secondary/30 rounded-xl p-4"><p class="text-[11px] text-muted-foreground uppercase tracking-wider mb-2">{{ m.label }}</p><div class="flex items-baseline gap-2 flex-wrap">{% if m.before %}<span class="text-sm text-muted-foreground/60 line-through">{{ m.before }}</span>{{ icon('arrow-right','h-3 w-3 text-primary shrink-0') }}{% endif %}<span class="text-lg font-black text-primary">{{ m.after or m.highlight }}</span></div></div>{% endfor %}</div>
+    {% set charts = c.metrics | selectattr('chartBefore') | list %}
+    {% if charts %}<div class="mt-8 space-y-5">{% for m in charts %}{% set mx = [m.chartBefore, m.chartAfter] | max %}<div><p class="text-sm font-semibold text-foreground mb-2">{{ m.label }}</p>
+      <div class="flex items-center gap-3 mb-1"><span class="w-14 text-xs text-muted-foreground">До</span><div class="flex-1 h-3 rounded-full bg-secondary overflow-hidden"><div class="h-full rounded-full bg-muted-foreground/30" style="width: {{ (m.chartBefore / mx * 100) | round(1) }}%"></div></div><span class="w-24 text-xs text-muted-foreground text-right">{{ m.before }}</span></div>
+      <div class="flex items-center gap-3"><span class="w-14 text-xs text-muted-foreground">После</span><div class="flex-1 h-3 rounded-full bg-secondary overflow-hidden"><div class="h-full rounded-full bg-primary" style="width: {{ (m.chartAfter / mx * 100) | round(1) }}%"></div></div><span class="w-24 text-xs font-semibold text-primary text-right">{{ m.after }}</span></div></div>{% endfor %}</div>{% endif %}
+  </div>{% endif %}
+  {% if c.client_quote %}<blockquote class="rounded-2xl border border-border bg-secondary p-6 italic text-foreground">«{{ c.client_quote }}»</blockquote>{% endif %}
+  {% if others %}<div><h2 class="text-xl font-black text-foreground mb-4">Другие кейсы</h2><div class="grid sm:grid-cols-3 gap-4">{% for o in others %}<a href="/cases/{{ o.slug }}" class="group rounded-xl border border-border bg-card p-4 hover:border-primary/30 transition-colors"><p class="text-xs text-primary font-semibold mb-1">{{ o.niche }}</p><p class="font-bold text-foreground group-hover:text-primary transition-colors leading-tight">{{ o.title }}</p></a>{% endfor %}</div></div>{% endif %}
+</div>
+<section class="py-14 bg-gradient-to-r from-primary/10 via-primary/5 to-background"><div class="container mx-auto px-4 lg:px-8 text-center">{{ icon('zap','h-8 w-8 text-primary mx-auto mb-3') }}<h2 class="text-2xl lg:text-3xl font-black text-foreground mb-3">Хотите такие же результаты?</h2><p class="text-muted-foreground mb-6 max-w-md mx-auto text-sm">Обсудим, как применить наш опыт в вашей нише</p><button data-open="quiz" class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-md px-8 shadow-lg shadow-primary/20">Оставить заявку {{ icon('arrow-right','ml-2 h-4 w-4') }}</button></div></section>
+</div>
