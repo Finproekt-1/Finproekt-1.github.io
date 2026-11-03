@@ -77,3 +77,8 @@
 .fp-faq details[open] summary::after{content:"−"}
 .fp-faq details p{padding:0 0 18px;color:hsl(var(--muted-foreground));line-height:1.6}
 .fp-faq a{color:hsl(var(--primary));text-decoration:underline}
+/* Команда: компетенции без процентов самооценки */
+.team-card .team-hover .tabular-nums{display:none}
+.team-card .team-hover .h-1.rounded-full{display:none}
+.team-card .team-hover .mb-2\.5 .mb-1{margin-bottom:0}
+.team-card .team-hover .mb-2\.5 span.text-white\/80::before{content:"— ";color:hsl(var(--primary))}
