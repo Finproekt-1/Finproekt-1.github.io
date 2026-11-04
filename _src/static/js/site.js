@@ -160,7 +160,7 @@
     if (!FP.booking) { body.innerHTML = doneHtml(); bindClose(body); return; }
     body.innerHTML = '<div class="flex flex-col items-center py-10 gap-3"><div class="fp-spin"></div><p class="text-sm text-muted-foreground">Заявка принята. Подбираем свободное время…</p></div>';
     fetchT(FP.booking + '?action=slots', {}, 12000).then(function (r) { return r.json(); })
-      .then(function (d) { if (!d.ok || !d.days || !d.days.length) throw 0; renderSlots(body, lead, d.days, ''); goal('booking_shown'); })
+      .then(function (d) { if (!d.ok || !d.days || !d.days.length) throw 0; renderSlots(body, lead, d.days, ''); goal('book_slots_shown'); })
       .catch(function () { body.innerHTML = doneHtml(); bindClose(body); });
   }
   function renderSlots(body, lead, days, note) {
@@ -183,7 +183,7 @@
           .then(function (r) { return r.json(); })
           .then(function (d) {
             if (d.ok) {
-              goal('booking');
+              goal('book_confirmed');
               body.innerHTML = '<div class="flex flex-col items-center py-8 gap-4 text-center"><p class="text-lg font-bold text-foreground">Встреча назначена!</p><p class="text-base text-foreground">' + esc(b.getAttribute('data-label')) + ' МСК · Zoom · 30 минут</p><p class="text-sm text-muted-foreground">' + (payload.email ? 'Приглашение придёт на ' + esc(payload.email) + '. ' : '') + 'Ссылку на Zoom мы также пришлём в мессенджер или по SMS. Если планы изменятся — просто напишите нам.</p><button data-close-q class="mt-2 ' + btnP + '">Готово</button></div>';
               bindClose(body);
             } else if (d.error === 'busy' && d.days && d.days.length) renderSlots(body, lead, d.days, 'Это время только что заняли — выберите другое.');
