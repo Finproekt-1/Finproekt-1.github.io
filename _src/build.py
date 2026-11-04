@@ -56,7 +56,7 @@ def write(path, content_html, title, description, jsonld=None, og_type='website'
         path = path + '/'
     page = dict(path=path, title=title, description=description, jsonld=jsonld or [], og_type=og_type, image=image, robots=robots)
     out = env.get_template('base.html').render(page=page, header=Markup(HEADER), footer=Markup(FOOTER), content=Markup(content_html), ver=VER)
-    out = re.sub(r'href="(/(?:blog|baza-znanij|cases|privacy|terms|audit|finotdel|cfo|marketplejsy)(?:/[\w%-]+)?)(#[^"]*)?"', lambda m: f'href="{m.group(1)}/{m.group(2) or ""}"', out)
+    out = re.sub(r'href="(/(?:blog|baza-znanij|cases|privacy|terms|audit|finotdel|cfo|marketplejsy|zapis)(?:/[\w%-]+)?)(#[^"]*)?"', lambda m: f'href="{m.group(1)}/{m.group(2) or ""}"', out)
     fp = DIST + (path if path.endswith('.html') else (path.rstrip('/') + '/index.html'))
     os.makedirs(os.path.dirname(fp), exist_ok=True)
     open(fp, 'w').write(out)
@@ -166,6 +166,10 @@ def build():
               f"{c['title']} — кейс ФинПроект-1", desc,
               jsonld=[breadcrumbs([('Главная', '/'), ('Кейсы', '/cases'), (c['title'], '/cases/' + c['slug'])])],
               lastmod=(c.get('updated_at') or '')[:10] or None)
+
+    # --- direct booking page (for personal links; not indexed)
+    write('/zapis', partial('zapis_main.html'), 'Запись на бесплатную консультацию — ФинПроект-1',
+          'Выберите удобное время бесплатной видеовстречи с финансовым специалистом ФинПроект-1.', robots='noindex, follow', sitemap=False)
 
     # --- service landing pages (draft → noindex, not in sitemap, not linked)
     bys = {c['slug']: c for c in cases}

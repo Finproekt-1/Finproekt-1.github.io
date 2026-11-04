@@ -130,9 +130,14 @@
       var data = { name: name, phone: phone, source: f.getAttribute('data-lead-form') };
       if (f.tariff) data.tariff = f.tariff.value;
       if (f.turnover && f.turnover.value) data.team_size = f.turnover.value;
+      if (f.topic && f.topic.value.trim()) data.tasks = [f.topic.value.trim()];
+      var ref = (location.search.match(/[?&](?:from|utm_source)=([^&]+)/) || [])[1];
+      if (ref) data.tasks = (data.tasks || []).concat(['Ссылка: ' + decodeURIComponent(ref)]);
       sendLead(data).then(function () {
         f.reset(); goal('lead'); goal('lead_' + data.source);
-        if (FP.booking) { openDialog('booking'); bookingFlow($('[data-booking-body]'), data); }
+        var inl = f.getAttribute('data-booking-inline') && $(f.getAttribute('data-booking-inline'));
+        if (inl) { f.style.display = 'none'; inl.innerHTML = ''; bookingFlow(inl, data); inl.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        else if (FP.booking) { openDialog('booking'); bookingFlow($('[data-booking-body]'), data); }
         else { toast('Заявка отправлена! Мы свяжемся с вами, чтобы уточнить задачу и договориться о консультации.'); closeDialog(); }
       }).catch(function () { toast('Не удалось отправить. Позвоните нам: +7 (927) 424-78-78', true); })
         .then(function () { if (btn) btn.disabled = false; });
@@ -152,7 +157,13 @@
   /* ---------- booking: выбор времени консультации по календарю ---------- */
   var btnP = 'inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4';
   function doneHtml() { return '<div class="flex flex-col items-center py-8 gap-4"><p class="text-lg font-bold text-foreground text-center">Спасибо! Заявка принята.</p><p class="text-sm text-muted-foreground text-center">Мы свяжемся с вами, уточним задачу и договоримся о видеозвонке с финансовым специалистом.</p><button data-close-q class="mt-4 ' + btnP + '">Закрыть</button></div>'; }
-  function bindClose(body) { var c = $('[data-close-q]', body); if (c) c.addEventListener('click', closeDialog); }
+  function bindClose(body) {
+    var c = $('[data-close-q]', body); if (!c) return;
+    c.addEventListener('click', function () {
+      if (body.closest('[data-dialog]')) { closeDialog(); return; }
+      body.innerHTML = '<div class="flex flex-col items-center py-8 gap-3 text-center"><p class="text-lg font-bold text-foreground">Спасибо!</p><p class="text-sm text-muted-foreground">Заявка у нас. Мы свяжемся с вами и подберём удобное время.</p><a href="/" class="mt-2 text-primary hover:underline text-sm">На главную</a></div>';
+    });
+  }
   function fetchT(url, opt, ms) {
     return new Promise(function (res, rej) { var t = setTimeout(function () { rej(new Error('timeout')); }, ms); fetch(url, opt).then(function (r) { clearTimeout(t); res(r); }, function (e) { clearTimeout(t); rej(e); }); });
   }

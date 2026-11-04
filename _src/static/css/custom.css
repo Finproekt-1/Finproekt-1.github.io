@@ -154,3 +154,10 @@
 @media (min-width:1024px){.fp-founders-cap{bottom:20px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}}
 .fp-founders-col{margin-bottom:-64px}
 @media (min-width:1024px){.fp-founders-col{margin-bottom:-96px;align-self:end}}
+.fp-zapis{display:grid;gap:32px;align-items:start;max-width:1100px;margin:0 auto}
+@media (min-width:1024px){.fp-zapis{grid-template-columns:1fr 440px;gap:56px;padding-top:24px}}
+.fp-zapis-card{background:hsl(var(--background));border:1px solid hsl(var(--border));border-radius:20px;padding:28px;box-shadow:0 20px 50px -30px hsl(var(--primary)/.45)}
+.fp-zapis-svc{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.fp-zapis-svc a{font-size:.85rem;padding:6px 12px;border-radius:999px;border:1px solid hsl(var(--border));color:hsl(var(--muted-foreground));background:hsl(var(--background))}
+.fp-zapis-svc a:hover{border-color:hsl(var(--primary)/.5);color:hsl(var(--primary))}
+[data-zapis-booking]{scroll-margin-top:90px}
