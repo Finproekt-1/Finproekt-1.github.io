@@ -82,3 +82,5 @@
 .team-card .team-hover .h-1.rounded-full{display:none}
 .team-card .team-hover .mb-2\.5 .mb-1{margin-bottom:0}
 .team-card .team-hover .mb-2\.5 span.text-white\/80::before{content:"— ";color:hsl(var(--primary))}
+.fp-spin{width:28px;height:28px;border-radius:50%;border:3px solid hsl(var(--primary)/.2);border-top-color:hsl(var(--primary));animation:fpspin .8s linear infinite}
+@keyframes fpspin{to{transform:rotate(360deg)}}
