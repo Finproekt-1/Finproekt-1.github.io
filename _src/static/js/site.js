@@ -131,7 +131,9 @@
       if (f.tariff) data.tariff = f.tariff.value;
       if (f.turnover && f.turnover.value) data.team_size = f.turnover.value;
       sendLead(data).then(function () {
-        toast('Заявка отправлена! Мы свяжемся с вами, чтобы уточнить задачу и договориться о консультации.'); f.reset(); closeDialog(); goal('lead'); goal('lead_' + data.source);
+        f.reset(); goal('lead'); goal('lead_' + data.source);
+        if (FP.booking) { openDialog('booking'); bookingFlow($('[data-booking-body]'), data); }
+        else { toast('Заявка отправлена! Мы свяжемся с вами, чтобы уточнить задачу и договориться о консультации.'); closeDialog(); }
       }).catch(function () { toast('Не удалось отправить. Позвоните нам: +7 (927) 424-78-78', true); })
         .then(function () { if (btn) btn.disabled = false; });
     });
@@ -146,6 +148,52 @@
       .catch(function () { toast('Не удалось отправить отзыв. Напишите нам в Telegram.', true); });
   });
 
+
+  /* ---------- booking: выбор времени консультации по календарю ---------- */
+  var btnP = 'inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4';
+  function doneHtml() { return '<div class="flex flex-col items-center py-8 gap-4"><p class="text-lg font-bold text-foreground text-center">Спасибо! Заявка принята.</p><p class="text-sm text-muted-foreground text-center">Мы свяжемся с вами, уточним задачу и договоримся о видеозвонке с финансовым специалистом.</p><button data-close-q class="mt-4 ' + btnP + '">Закрыть</button></div>'; }
+  function bindClose(body) { var c = $('[data-close-q]', body); if (c) c.addEventListener('click', closeDialog); }
+  function fetchT(url, opt, ms) {
+    return new Promise(function (res, rej) { var t = setTimeout(function () { rej(new Error('timeout')); }, ms); fetch(url, opt).then(function (r) { clearTimeout(t); res(r); }, function (e) { clearTimeout(t); rej(e); }); });
+  }
+  function bookingFlow(body, lead) {
+    if (!FP.booking) { body.innerHTML = doneHtml(); bindClose(body); return; }
+    body.innerHTML = '<div class="flex flex-col items-center py-10 gap-3"><div class="fp-spin"></div><p class="text-sm text-muted-foreground">Заявка принята. Подбираем свободное время…</p></div>';
+    fetchT(FP.booking + '?action=slots', {}, 12000).then(function (r) { return r.json(); })
+      .then(function (d) { if (!d.ok || !d.days || !d.days.length) throw 0; renderSlots(body, lead, d.days, ''); goal('booking_shown'); })
+      .catch(function () { body.innerHTML = doneHtml(); bindClose(body); });
+  }
+  function renderSlots(body, lead, days, note) {
+    var h = '<div class="space-y-4"><div class="rounded-lg bg-primary/10 p-3 text-sm"><b class="text-foreground">Заявка принята!</b> <span class="text-muted-foreground">Выберите удобное время для бесплатной консультации — видеовстреча в Zoom, 30 минут.</span></div>' +
+      (note ? '<p class="text-sm text-destructive">' + esc(note) + '</p>' : '');
+    days.forEach(function (d) {
+      h += '<div><p class="text-sm font-semibold text-foreground mb-2 first-letter:uppercase">' + esc(d.label) + '</p><div class="grid grid-cols-2 gap-2">' +
+        d.slots.map(function (s) { return '<button type="button" data-slot="' + esc(s.start) + '" data-label="' + esc(d.label + ', ' + s.time) + '" class="' + optCls + off + ' text-center font-medium">' + esc(s.time) + ' <span class="text-xs">МСК</span></button>'; }).join('') + '</div></div>';
+    });
+    h += '<input data-bk-email type="email" value="' + esc(lead._email || '') + '" placeholder="E-mail для приглашения (необязательно)" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm h-11 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">' +
+      '<p class="text-xs text-muted-foreground text-center">Время указано московское. Не подходит? <button type="button" data-close-q class="text-primary hover:underline">Мы позвоним и подберём другое</button></p></div>';
+    body.innerHTML = h; bindClose(body);
+    $$('[data-slot]', body).forEach(function (b) {
+      b.addEventListener('click', function () {
+        $$('[data-slot]', body).forEach(function (x) { x.disabled = true; });
+        b.textContent = 'Записываем…';
+        var em = lead._email = (($('[data-bk-email]', body) || {}).value || '').trim();
+        var payload = { action: 'book', start: b.getAttribute('data-slot'), name: lead.name, phone: lead.phone, email: em.trim(), source: lead.source, niche: lead.niche || '', turnover: lead.team_size || '', tasks: lead.tasks || lead.tariff || '' };
+        fetchT(FP.booking, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) }, 20000)
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            if (d.ok) {
+              goal('booking');
+              body.innerHTML = '<div class="flex flex-col items-center py-8 gap-4 text-center"><p class="text-lg font-bold text-foreground">Встреча назначена!</p><p class="text-base text-foreground">' + esc(b.getAttribute('data-label')) + ' МСК · Zoom · 30 минут</p><p class="text-sm text-muted-foreground">' + (payload.email ? 'Приглашение придёт на ' + esc(payload.email) + '. ' : '') + 'Ссылку на Zoom мы также пришлём в мессенджер или по SMS. Если планы изменятся — просто напишите нам.</p><button data-close-q class="mt-2 ' + btnP + '">Готово</button></div>';
+              bindClose(body);
+            } else if (d.error === 'busy' && d.days && d.days.length) renderSlots(body, lead, d.days, 'Это время только что заняли — выберите другое.');
+            else throw 0;
+          })
+          .catch(function () { body.innerHTML = doneHtml(); bindClose(body); });
+      });
+    });
+  }
+
   /* ---------- quiz ---------- */
   var Q = FP.quiz || {}, qs, qStep;
   var steps = ['Ниша', 'Оборот', 'Задачи', 'Контакты'];
@@ -155,10 +203,7 @@
   function canNext() { return qStep === 0 ? !!qs.niche : qStep === 1 ? !!qs.turnover : qStep === 2 ? qs.tasks.length > 0 : (!!qs.name.trim() && validPhone(qs.phone)); }
   function renderQuiz(done) {
     var body = $('[data-quiz-body]'); if (!body) return;
-    if (done) {
-      body.innerHTML = '<div class="flex flex-col items-center py-8 gap-4"><p class="text-lg font-bold text-foreground text-center">Спасибо! Заявка принята.</p><p class="text-sm text-muted-foreground text-center">Мы свяжемся с вами, уточним задачу и договоримся о видеозвонке с финансовым специалистом.</p><button data-close-q class="mt-4 inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4">Закрыть</button></div>';
-      $('[data-close-q]', body).addEventListener('click', closeDialog); return;
-    }
+    if (done) { bookingFlow(body, done); return; }
     var h = '<div class="flex gap-1 mb-4">' + steps.map(function (s, i) { return '<div class="flex-1 flex flex-col items-center gap-1"><div class="h-1.5 w-full rounded-full ' + (i <= qStep ? 'bg-primary' : 'bg-muted') + '"></div><span class="text-[10px] ' + (i <= qStep ? 'text-primary font-semibold' : 'text-muted-foreground') + '">' + s + '</span></div>'; }).join('') + '</div>';
     if (qStep === 0) h += '<p class="text-sm text-muted-foreground mb-3">В какой нише ваш бизнес?</p><div class="grid grid-cols-2 gap-2">' + Q.niches.map(function (n) { return '<button type="button" data-q="niche" data-v="' + esc(n) + '" class="' + optCls + (qs.niche === n ? on : off) + '">' + esc(n) + '</button>'; }).join('') + '</div>';
     if (qStep === 1) h += '<p class="text-sm text-muted-foreground mb-3">Какой оборот вашего бизнеса?</p><div class="space-y-2">' + Q.turnover.map(function (t) { return '<button type="button" data-q="turnover" data-v="' + esc(t[1]) + '" class="w-full px-4 py-3 ' + optCls + (qs.turnover === t[1] ? on : off) + '">' + esc(t[0]) + '</button>'; }).join('') + '</div>';
@@ -185,8 +230,9 @@
       if (!canNext()) return;
       if (qStep < 3) { qStep++; goal('quiz_step_' + (qStep + 1)); renderQuiz(); return; }
       var btn = this; btn.disabled = true; btn.textContent = 'Отправка...';
-      sendLead({ name: qs.name.trim(), phone: normPhone(qs.phone), source: 'quiz', niche: qs.niche, team_size: qs.turnover, tasks: qs.tasks })
-        .then(function () { goal('lead'); goal('lead_quiz'); renderQuiz(true); })
+      var ql = { name: qs.name.trim(), phone: normPhone(qs.phone), source: 'quiz', niche: qs.niche, team_size: qs.turnover, tasks: qs.tasks };
+      sendLead(ql)
+        .then(function () { goal('lead'); goal('lead_quiz'); renderQuiz(ql); })
         .catch(function () { toast('Не удалось отправить. Позвоните нам: +7 (927) 424-78-78', true); btn.disabled = false; btn.textContent = 'Получить консультацию'; });
     });
   }
