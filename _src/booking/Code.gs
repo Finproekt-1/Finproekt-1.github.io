@@ -20,6 +20,8 @@ var CFG = {
   SLOTS_PER_DAY: 2, DAYS: 2,        // 2 окна в первый день и 2 во второй
   MIN_GAP_MIN: 120,                 // второе окно дня — минимум через 2 часа после первого (если возможно)
   ZOOM_LINK: '',                    // постоянная ссылка Zoom (если пусто — ссылку пришлём отдельно)
+  EXTRA_CALENDARS: ['olga.glavnoe@gmail.com'],  // доп. календари, занятость в которых тоже учитывается
+  INVITE_EXTRA: true,               // приглашать доп. календари на встречу (чтобы запись была видна и там)
   NOTIFY_EMAIL: '',                 // куда слать письмо о новой записи (пусто — на почту владельца)
   TITLE: 'Консультация ФинПроект-1'
 };
@@ -47,7 +49,10 @@ function doPost(e) {
       CFG.ZOOM_LINK ? 'Zoom: ' + CFG.ZOOM_LINK : 'Zoom: ссылку отправить клиенту'
     ].filter(String).join('\n');
     var opts = { description: desc, location: CFG.ZOOM_LINK || 'Zoom' };
-    if (d.email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) { opts.guests = d.email; opts.sendInvites = true; }
+    var guests = [];
+    if (d.email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) guests.push(String(d.email).trim());
+    if (CFG.INVITE_EXTRA) guests = guests.concat(CFG.EXTRA_CALENDARS);
+    if (guests.length) { opts.guests = guests.join(','); opts.sendInvites = true; }
     var ev = CalendarApp.getDefaultCalendar().createEvent(CFG.TITLE + ' — ' + clean_(d.name), start, end, opts);
     ev.addPopupReminder(15);
     var when = Utilities.formatDate(start, CFG.CLIENT_TZ, 'dd.MM.yyyy HH:mm') + ' МСК (' +
@@ -104,7 +109,12 @@ function at_(ymd, hour) { // ymd + час по Москве → Date
 }
 function busy_(from, to) {
   var list = [], buf = CFG.BUFFER_MIN * 60000;
-  CalendarApp.getAllOwnedCalendars().forEach(function (cal) {
+  var cals = CalendarApp.getAllOwnedCalendars();
+  CFG.EXTRA_CALENDARS.forEach(function (id) {
+    var c = null; try { c = CalendarApp.getCalendarById(id); } catch (x) {}
+    if (c) cals.push(c); else Logger.log('Нет доступа к календарю ' + id);
+  });
+  cals.forEach(function (cal) {
     if (cal.isHidden && cal.isHidden()) return;
     cal.getEvents(from, to).forEach(function (ev) {
       if (ev.isAllDayEvent()) return;
@@ -132,4 +142,12 @@ function clean_(v) { return String(Array.isArray(v) ? v.join(', ') : v).replace(
 function json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
 
 /* Проверка из редактора: Выполнить → testSlots, смотреть «Журнал выполнения». */
+function testCalendars() {
+  CFG.EXTRA_CALENDARS.forEach(function (id) {
+    var c = CalendarApp.getCalendarById(id);
+    if (!c) { Logger.log(id + ': НЕТ ДОСТУПА'); return; }
+    var ev = c.getEvents(new Date(), new Date(Date.now() + 14 * 864e5));
+    Logger.log(id + ': событий на 2 недели — ' + ev.length + (ev[0] ? ', первое: ' + ev[0].getTitle() + ' ' + ev[0].getStartTime() : ''));
+  });
+}
 function testSlots() { Logger.log(JSON.stringify(findSlots_(), null, 2)); }
