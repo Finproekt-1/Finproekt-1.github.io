@@ -19,6 +19,11 @@
   <ul class="fp-svc-who">{% for w in s.for_whom %}<li>{{ icon('circle-check','h-5 w-5') }}<span>{{ w }}</span></li>{% endfor %}</ul>
 </div></section>
 
+{% for cs in s.cols_sections or [] %}<section class="fp-sec{% if loop.index is odd %} fp-sec-alt{% endif %}"><div class="container mx-auto px-4 lg:px-8">
+  <div class="fp-head"><h2>{{ cs.title }}</h2>{% if cs.note %}<p>{{ cs.note }}</p>{% endif %}</div>
+  <div class="fp-cols">{% for c in cs.cols %}<div class="fp-col"><h3>{{ c.h }}</h3><p>{{ c.p }}</p><ul>{% for i in c['items'] %}<li>{{ icon('check','h-4 w-4') }}<span>{{ i }}</span></li>{% endfor %}</ul></div>{% endfor %}</div>
+</div></section>{% endfor %}
+
 <section class="fp-sec fp-sec-alt"><div class="container mx-auto px-4 lg:px-8">
   <div class="fp-head"><h2>{{ s.deliverables_title }}</h2></div>
   <div class="fp-svc-grid">{% for d in s.deliverables %}<div class="fp-svc-card"><h3>{{ d[0] }}</h3><p>{{ d[1] }}</p></div>{% endfor %}</div>
@@ -35,10 +40,10 @@
   <div class="fp-svc-table"><table><thead><tr><th></th><th>Штатный финотдел</th><th>ФинПроект-1</th></tr></thead><tbody>{% for r in s.compare.rows %}<tr><td>{{ r[0] }}</td><td>{{ r[1] }}</td><td>{{ r[2] }}</td></tr>{% endfor %}</tbody></table></div>
 </div></section>{% endif %}
 
-<section class="fp-sec"><div class="container mx-auto px-4 lg:px-8">
+{% if s.steps %}<section class="fp-sec"><div class="container mx-auto px-4 lg:px-8">
   <div class="fp-head"><h2>Как проходит работа</h2></div>
   <ol class="fp-steps">{% for t in s.steps %}<li><span class="fp-num">{{ loop.index }}</span><h3>{{ t[0] }}</h3><p>{{ t[1] }}</p></li>{% endfor %}</ol>
-</div></section>
+</div></section>{% endif %}
 
 <section id="svc-cases" class="fp-sec fp-sec-alt"><div class="container mx-auto px-4 lg:px-8">
   <div class="fp-head"><h2>Результаты клиентов</h2></div>
