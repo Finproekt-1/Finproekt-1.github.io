@@ -15,7 +15,7 @@
     "supabase_url": "https://gxcxmyxodlqleuvviofd.supabase.co",
     "anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4Y3hteXhvZGxxbGV1dnZpb2ZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNTU1NTUsImV4cCI6MjA4ODczMTU1NX0.CvS_zHk2r0QI66Yf7J8KRscKOl5B3JjUTgOdnK0j19I",
     "chat_url": "https://gxcxmyxodlqleuvviofd.supabase.co/functions/v1/ai-consultant",
-    "booking_url": ""
+    "booking_url": "https://script.google.com/macros/s/AKfycbzNCECoFdxcg8TsTstI8-85IesNMw7yaIMIgB6l7BZ1P_aEgFSJqgjikNFoo_eWpnxecg/exec"
   },
   "services": [
     {"name": "Аудит бизнеса", "price": "50 000 ₽", "desc": "Полная диагностика финансов за 2 недели"},
