@@ -270,7 +270,7 @@
   },
   {
     "slug": "cfo",
-    "draft": true,
+    "draft": false,
     "service": "CFO (Финдиректор — уровень проектов)",
     "kicker": "CFO на аутсорсе",
     "h1": "CFO на аутсорсе",
@@ -412,7 +412,7 @@
   },
   {
     "slug": "marketplejsy",
-    "draft": true,
+    "draft": false,
     "service": "Финучёт для маркетплейсов",
     "kicker": "Для селлеров Wildberries и Ozon",
     "h1": "Финансовый учёт для селлеров",

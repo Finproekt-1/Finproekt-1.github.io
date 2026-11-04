@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-background">
-<section class="relative bg-gradient-to-br from-primary/8 via-background to-primary/4 pt-28 lg:pt-36 pb-14 lg:pb-20 overflow-hidden">
+<section class="relative bg-gradient-to-br from-primary/8 via-background to-primary/4 pt-24 lg:pt-28 pb-10 lg:pb-12 overflow-hidden">
   <div class="container mx-auto px-4 lg:px-8">
     <nav class="fp-crumbs"><a href="/">Главная</a> / <span>{{ s.kicker }}</span></nav>
     <div class="fp-svc-hero">
@@ -8,16 +8,13 @@
         <h1 class="fp-svc-h1">{{ s.h1 }} <span>— {{ s.h1_accent }}</span></h1>
         <p class="fp-svc-lead">{{ s.lead }}</p>
         <div class="fp-svc-cta"><a href="#svc-form" class="fp-btn">{{ s.cta }}</a><a href="#svc-cases" class="fp-btn-o">Результаты клиентов</a></div>
+        <div class="fp-fit"><p>Подходит, если:</p><ul>{% for w in s.for_whom %}<li>{{ icon('check','h-3.5 w-3.5') }}<span>{{ w }}</span></li>{% endfor %}</ul></div>
       </div>
       <div class="fp-svc-price"><p>Стоимость</p><b>{{ s.price }}</b><span>{{ s.price_note }}</span></div>
     </div>
   </div>
 </section>
 
-<section class="fp-sec"><div class="container mx-auto px-4 lg:px-8">
-  <div class="fp-head"><h2>Кому подходит</h2></div>
-  <ul class="fp-svc-who">{% for w in s.for_whom %}<li>{{ icon('circle-check','h-5 w-5') }}<span>{{ w }}</span></li>{% endfor %}</ul>
-</div></section>
 
 {% for cs in s.cols_sections or [] %}<section class="fp-sec{% if loop.index is odd %} fp-sec-alt{% endif %}"><div class="container mx-auto px-4 lg:px-8">
   <div class="fp-head"><h2>{{ cs.title }}</h2>{% if cs.note %}<p>{{ cs.note }}</p>{% endif %}</div>
