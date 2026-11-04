@@ -98,7 +98,7 @@
 .fp-btn-o:hover{border-color:hsl(var(--primary)/.5)}
 .fp-svc-price{border:2px solid hsl(var(--primary)/.35);background:hsl(var(--background));border-radius:20px;padding:24px}
 .fp-svc-price p{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:hsl(var(--muted-foreground));font-weight:700}
-.fp-svc-price b{display:block;font-size:1.9rem;font-weight:900;color:hsl(var(--primary));margin:6px 0}
+.fp-svc-price b{display:block;white-space:nowrap;font-size:1.75rem;font-weight:900;color:hsl(var(--primary));margin:6px 0}
 .fp-svc-price span{font-size:.88rem;color:hsl(var(--muted-foreground));line-height:1.45;display:block}
 .fp-svc-who{list-style:none;padding:0;margin:0 auto;max-width:880px;display:grid;gap:12px}
 @media (min-width:768px){.fp-svc-who{grid-template-columns:1fr 1fr}}
