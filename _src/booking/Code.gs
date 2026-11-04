@@ -12,6 +12,8 @@ var CFG = {
   CLIENT_TZ: 'Europe/Moscow',       // в каком времени показываем окна клиенту
   WORK_FROM: 10, WORK_TO: 18,       // окно записи по МОСКВЕ (часы): 10:00–18:00 МСК = 15:00–23:00 в Китае
   WORK_DAYS: [1, 2, 3, 4, 5],       // пн–пт (по Москве)
+  // Постоянно занятые интервалы по времени ВЛАДЕЛЬЦА (Китай): день недели 0=вс…6=сб, часы с–по
+  BLOCKED: [{ dow: 3, from: 16, to: 20 }, { dow: 5, from: 16, to: 20 }],  // ср и пт 16–20 — секция сына
   DURATION_MIN: 30,                 // длительность встречи
   BUFFER_MIN: 15,                   // зазор до и после других событий
   LEAD_TIME_MIN: 90,                // не раньше чем через 1,5 часа от текущего момента
@@ -73,14 +75,15 @@ function findSlots_() {
     for (; t.getTime() + CFG.DURATION_MIN * 60000 <= stop.getTime(); t = new Date(t.getTime() + step)) {
       if (t < earliest) continue;
       var e = new Date(t.getTime() + CFG.DURATION_MIN * 60000);
-      if (overlaps_(busy, t, e)) continue;
+      if (overlaps_(busy, t, e) || blocked_(t, e)) continue;
       if (picked.length && t - picked[picked.length - 1] < CFG.MIN_GAP_MIN * 60000) continue;
       picked.push(t); if (picked.length === CFG.SLOTS_PER_DAY) break;
     }
     if (picked.length < CFG.SLOTS_PER_DAY) { // если с зазором не хватило — берём ближайшие свободные
       for (t = at_(ymd, CFG.WORK_FROM); picked.length < CFG.SLOTS_PER_DAY && t.getTime() + CFG.DURATION_MIN * 60000 <= stop.getTime(); t = new Date(t.getTime() + step)) {
         if (t < earliest || picked.some(function (p) { return p.getTime() === t.getTime(); })) continue;
-        if (!overlaps_(busy, t, new Date(t.getTime() + CFG.DURATION_MIN * 60000))) picked.push(t);
+        var e2 = new Date(t.getTime() + CFG.DURATION_MIN * 60000);
+        if (!overlaps_(busy, t, e2) && !blocked_(t, e2)) picked.push(t);
       }
       picked.sort(function (a, b) { return a - b; });
     }
@@ -113,7 +116,13 @@ function busy_(from, to) {
   return list;
 }
 function overlaps_(busy, s, e) { s = s.getTime(); e = e.getTime(); return busy.some(function (b) { return s < b[1] && e > b[0]; }); }
-function isFree_(s, e) { return !overlaps_(busy_(new Date(s.getTime() - 864e5), new Date(e.getTime() + 864e5)), s, e); }
+function blocked_(s, e) { // пересекается ли [s,e) с постоянными блоками владельца
+  var dow = Number(Utilities.formatDate(s, CFG.OWNER_TZ, 'u')) % 7;
+  var h1 = Number(Utilities.formatDate(s, CFG.OWNER_TZ, 'H')) + Number(Utilities.formatDate(s, CFG.OWNER_TZ, 'm')) / 60;
+  var h2 = h1 + (e - s) / 3600000;
+  return CFG.BLOCKED.some(function (b) { return b.dow === dow && h1 < b.to && h2 > b.from; });
+}
+function isFree_(s, e) { if (blocked_(s, e)) return false; return !overlaps_(busy_(new Date(s.getTime() - 864e5), new Date(e.getTime() + 864e5)), s, e); }
 function ruLabel_(ymd, dow) {
   var D = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
   var M = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
