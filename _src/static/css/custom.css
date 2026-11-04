@@ -150,3 +150,7 @@
 .fp-founders-cap{bottom:84px}
 @media (min-width:640px){.fp-founders-cap{bottom:140px}}
 @media (min-width:1024px){.fp-founders-cap{bottom:222px;left:auto;right:12px;transform:none}}
+.fp-founders-cap,.fp-founders-cap{bottom:16px!important}
+@media (min-width:1024px){.fp-founders-cap{bottom:20px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}}
+.fp-founders-col{margin-bottom:-64px}
+@media (min-width:1024px){.fp-founders-col{margin-bottom:-96px;align-self:end}}
