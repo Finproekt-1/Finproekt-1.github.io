@@ -56,7 +56,7 @@ def write(path, content_html, title, description, jsonld=None, og_type='website'
         path = path + '/'
     page = dict(path=path, title=title, description=description, jsonld=jsonld or [], og_type=og_type, image=image, robots=robots)
     out = env.get_template('base.html').render(page=page, header=Markup(HEADER), footer=Markup(FOOTER), content=Markup(content_html), ver=VER)
-    out = re.sub(r'href="(/(?:blog|baza-znanij|cases|privacy|terms)(?:/[\w%-]+)?)(#[^"]*)?"', lambda m: f'href="{m.group(1)}/{m.group(2) or ""}"', out)
+    out = re.sub(r'href="(/(?:blog|baza-znanij|cases|privacy|terms|audit|finotdel|cfo|marketplejsy)(?:/[\w%-]+)?)(#[^"]*)?"', lambda m: f'href="{m.group(1)}/{m.group(2) or ""}"', out)
     fp = DIST + (path if path.endswith('.html') else (path.rstrip('/') + '/index.html'))
     os.makedirs(os.path.dirname(fp), exist_ok=True)
     open(fp, 'w').write(out)
@@ -166,6 +166,18 @@ def build():
               f"{c['title']} — кейс ФинПроект-1", desc,
               jsonld=[breadcrumbs([('Главная', '/'), ('Кейсы', '/cases'), (c['title'], '/cases/' + c['slug'])])],
               lastmod=(c.get('updated_at') or '')[:10] or None)
+
+    # --- service landing pages (draft → noindex, not in sitemap, not linked)
+    bys = {c['slug']: c for c in cases}
+    for sp in json.load(open(f'{SRC}/data/service_pages.json')):
+        sc = [bys[x] for x in sp.get('cases', []) if x in bys]
+        jl = [breadcrumbs([('Главная', '/'), (sp['kicker'], '/' + sp['slug'])]),
+              {"@context": "https://schema.org", "@type": "Service", "name": sp['service'], "description": sp['meta_description'],
+               "provider": {"@type": "Organization", "name": site['name'], "url": site['url']}, "areaServed": "RU",
+               "offers": {"@type": "Offer", "priceCurrency": "RUB", "description": sp['price']}},
+              {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": re.sub(r'<[^>]+>', '', a)}} for q, a in sp['faq']]}]
+        write('/' + sp['slug'], env.get_template('service.html').render(s=sp, cases=sc), sp['meta_title'], sp['meta_description'],
+              jsonld=jl, robots='noindex, nofollow' if sp.get('draft') else None, sitemap=not sp.get('draft'))
 
     # --- legal
     write('/privacy', partial('privacy_main.html'), 'Политика конфиденциальности — ФинПроект-1', 'Политика обработки и защиты персональных данных пользователей сайта ФинПроект-1.', lastmod='2026-03-12')
