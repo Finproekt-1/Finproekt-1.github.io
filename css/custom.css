@@ -184,3 +184,9 @@
 .fp-diag-cta{margin-top:28px;padding-top:24px;border-top:1px solid hsl(var(--border))}
 .fp-diag-cta form{margin-top:16px}
 [data-diag-booking]{scroll-margin-top:90px}
+.fp-diag-link{display:block;width:100%;text-align:center;margin-top:14px;font-size:.95rem;font-weight:600;color:hsl(var(--primary));text-decoration:underline;text-underline-offset:4px}
+.fp-diag-teaser{display:block;margin-top:48px;padding:24px 28px;border-radius:18px;border:2px solid hsl(var(--primary)/.35);background:hsl(var(--primary)/.06);transition:box-shadow .2s,transform .2s}
+.fp-diag-teaser:hover{box-shadow:0 14px 30px -18px hsl(var(--primary)/.6);transform:translateY(-2px)}
+.fp-diag-teaser b{display:block;font-size:1.3rem;font-weight:800;color:hsl(var(--foreground));margin-top:4px}
+.fp-diag-teaser span:not(.fp-kicker){display:block;margin-top:6px;color:hsl(var(--muted-foreground))}
+.fp-diag-teaser em{display:inline-block;margin-top:12px;font-style:normal;font-weight:700;color:hsl(var(--primary))}
