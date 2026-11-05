@@ -1,0 +1,8 @@
+<section class="relative bg-gradient-to-br from-primary/8 via-background to-primary/4 pt-24 lg:pt-28 pb-16 lg:pb-24 min-h-screen">
+<div class="container mx-auto px-4 lg:px-8"><div class="fp-diag-wrap">
+  <p class="fp-kicker">Диагностика за 2 минуты</p>
+  <h1 class="fp-svc-h1">Насколько управляемы финансы <span>вашего бизнеса?</span></h1>
+  <p class="fp-svc-lead">Ответьте на {{ d.questions|length }} вопросов «да» или «нет» — и сразу увидите, в какой зоне ваш бизнес и где, скорее всего, теряются деньги.</p>
+  <div class="fp-diag" data-diag></div>
+</div></div></section>
+<script>window.FP_DIAG={{ d | tojson }};</script>

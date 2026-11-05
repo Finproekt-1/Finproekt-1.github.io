@@ -121,7 +121,9 @@
     var p2 = fetch(FP.supabase + '/functions/v1/telegram-notify', { method: 'POST', headers: h, body: JSON.stringify(data) }).catch(function () {});
     return p1.then(function (r) { if (!r.ok) throw new Error('lead ' + r.status); return p2; });
   }
-  $$('[data-lead-form]').forEach(function (f) {
+  $$('[data-lead-form]').forEach(function (f) { bindLeadForm(f); });
+  function bindLeadForm(f) {
+    if (!f) return;
     f.addEventListener('submit', function (e) {
       e.preventDefault();
       var name = f.name.value.trim(), phone = normPhone(f.phone.value);
@@ -131,6 +133,7 @@
       if (f.tariff) data.tariff = f.tariff.value;
       if (f.turnover && f.turnover.value) data.team_size = f.turnover.value;
       if (f.topic && f.topic.value.trim()) data.tasks = [f.topic.value.trim()];
+      if (f.diag && f.diag.value) data.tasks = (data.tasks || []).concat([f.diag.value]);
       var ref = (location.search.match(/[?&](?:from|utm_source)=([^&]+)/) || [])[1];
       if (ref) data.tasks = (data.tasks || []).concat(['Ссылка: ' + decodeURIComponent(ref)]);
       sendLead(data).then(function () {
@@ -142,7 +145,7 @@
       }).catch(function () { toast('Не удалось отправить. Позвоните нам: +7 (927) 424-78-78', true); })
         .then(function () { if (btn) btn.disabled = false; });
     });
-  });
+  }
   var rf = $('[data-review-form]');
   if (rf) rf.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -204,6 +207,46 @@
       });
     });
   }
+
+
+  /* ---------- диагностика ---------- */
+  (function () {
+    var root = $('[data-diag]'), D = window.FP_DIAG; if (!root || !D) return;
+    var Q = D.questions, ans = [], i = 0, started = false;
+    function zone(n) { for (var k = 0; k < D.zones.length; k++) if (n >= D.zones[k].min) return D.zones[k]; return D.zones[D.zones.length - 1]; }
+    function q() {
+      var it = Q[i];
+      root.innerHTML = '<div class="fp-diag-card"><div class="fp-diag-prog"><span style="width:' + Math.round(i / Q.length * 100) + '%"></span></div>' +
+        '<p class="fp-diag-num">Вопрос ' + (i + 1) + ' из ' + Q.length + '</p><h2 class="fp-diag-q">' + esc(it.q) + '</h2><p class="fp-diag-hint">' + esc(it.hint) + '</p>' +
+        '<div class="fp-diag-btns"><button type="button" data-a="1" class="fp-btn">Да</button><button type="button" data-a="0" class="fp-btn-o">Нет / не уверен</button></div>' +
+        (i > 0 ? '<button type="button" data-back class="fp-diag-back">← Назад</button>' : '') + '</div>';
+      $$('[data-a]', root).forEach(function (b) { b.addEventListener('click', function () {
+        if (!started) { started = true; goal('diag_start'); }
+        ans[i] = b.getAttribute('data-a') === '1'; i++; if (i < Q.length) q(); else res();
+      }); });
+      var bk = $('[data-back]', root); if (bk) bk.addEventListener('click', function () { i--; q(); });
+    }
+    function res() {
+      var n = ans.filter(Boolean).length, z = zone(n), weak = [];
+      Q.forEach(function (it, k) { if (!ans[k]) weak.push(it); });
+      goal('diag_done');
+      root.innerHTML = '<div class="fp-diag-card"><div class="fp-diag-zone fp-z-' + z.color + '"><b>' + n + ' из ' + Q.length + '</b><span>' + esc(z.name) + '</span></div>' +
+        '<h2 class="fp-diag-q">' + esc(z.title) + '</h2><p class="fp-diag-hint">' + esc(z.text) + '</p>' +
+        (weak.length ? '<p class="fp-diag-sub">Где, скорее всего, теряются деньги:</p><ul class="fp-diag-weak">' + weak.slice(0, 3).map(function (w) { return '<li>' + esc(w.weak) + '</li>'; }).join('') + '</ul>' +
+          (weak.length > 3 ? '<p class="fp-diag-hint">И ещё ' + (weak.length - 3) + ' — разберём на консультации.</p>' : '') : '') +
+        '<div class="fp-diag-cta"><p class="fp-diag-sub" style="margin-top:0">Получите разбор результатов с финансовым специалистом</p><p class="fp-diag-hint">Бесплатная видеовстреча 30 минут: разберём ваши ответы и подскажем, с чего начать.</p>' +
+        '<form data-lead-form="diag" data-booking-inline="[data-diag-booking]" class="space-y-3">' +
+        '<input type="hidden" name="diag" value="' + esc('Диагностика: ' + n + '/' + Q.length + ' (' + z.name + '). Слабые места: ' + weak.map(function (w) { return w.q; }).join('; ')) + '">' +
+        '<input class="flex w-full rounded-md border border-input px-3 py-2 text-base md:text-sm h-12 bg-background" name="name" required placeholder="Ваше имя">' +
+        '<input type="tel" name="phone" required class="flex w-full rounded-md border border-input px-3 py-2 text-base md:text-sm h-12 bg-background" placeholder="+7XXXXXXXXXX">' +
+        '<button class="fp-btn" style="width:100%">Выбрать время разбора</button>' +
+        '<p class="text-xs text-muted-foreground text-center">Нажимая кнопку, вы соглашаетесь с <a href="/privacy" class="text-primary hover:underline">политикой обработки персональных данных</a></p></form>' +
+        '<div data-diag-booking></div></div><button type="button" data-restart class="fp-diag-back">Пройти заново</button></div>';
+      bindLeadForm($('[data-lead-form]', root));
+      $('[data-restart]', root).addEventListener('click', function () { ans = []; i = 0; q(); });
+    }
+    q();
+  })();
 
   /* ---------- quiz ---------- */
   var Q = FP.quiz || {}, qs, qStep;
