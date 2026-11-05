@@ -56,7 +56,7 @@ def write(path, content_html, title, description, jsonld=None, og_type='website'
         path = path + '/'
     page = dict(path=path, title=title, description=description, jsonld=jsonld or [], og_type=og_type, image=image, robots=robots)
     out = env.get_template('base.html').render(page=page, header=Markup(HEADER), footer=Markup(FOOTER), content=Markup(content_html), ver=VER)
-    out = re.sub(r'href="(/(?:blog|baza-znanij|cases|privacy|terms|audit|finotdel|cfo|marketplejsy|zapis|diagnostika)(?:/[\w%-]+)?)(#[^"]*)?"', lambda m: f'href="{m.group(1)}/{m.group(2) or ""}"', out)
+    out = re.sub(r'href="(/(?:blog|baza-znanij|cases|privacy|terms|audit|finotdel|cfo|marketplejsy|upravlencheskij-uchet|zapis|diagnostika)(?:/[\w%-]+)?)(#[^"]*)?"', lambda m: f'href="{m.group(1)}/{m.group(2) or ""}"', out)
     fp = DIST + (path if path.endswith('.html') else (path.rstrip('/') + '/index.html'))
     os.makedirs(os.path.dirname(fp), exist_ok=True)
     open(fp, 'w').write(out)
