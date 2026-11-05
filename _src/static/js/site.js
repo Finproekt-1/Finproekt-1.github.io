@@ -209,6 +209,7 @@
   }
 
 
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-diag-teaser]')) goal('diag_teaser'); });
   /* ---------- диагностика ---------- */
   (function () {
     var root = $('[data-diag]'), D = window.FP_DIAG; if (!root || !D) return;

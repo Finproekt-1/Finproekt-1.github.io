@@ -12,9 +12,11 @@
     {% if p.cover %}<img src="{{ p.cover }}" alt="{{ p.title }}" width="1200" height="670" class="w-full h-auto rounded-2xl mb-8">{% endif %}
     <div class="prose">{{ p.html }}</div>
 
-    <div class="mt-12 rounded-2xl bg-secondary border border-border p-6 lg:p-8 text-center">
+    <a href="/diagnostika" class="fp-diag-teaser" data-diag-teaser><span class="fp-kicker">Тест за 2 минуты</span><b>Насколько управляемы финансы вашего бизнеса?</b><span>10 вопросов «да/нет» — сразу увидите, где, скорее всего, теряются деньги</span><em>Пройти диагностику →</em></a>
+
+    <div class="mt-8 rounded-2xl bg-secondary border border-border p-6 lg:p-8 text-center">
       <h2 class="text-2xl font-black text-foreground mb-2">Разберём финансы вашего бизнеса</h2>
-      <p class="text-muted-foreground mb-6">Аудит финансов за 2 недели: покажем, где бизнес теряет деньги и сколько он зарабатывает на самом деле.</p>
+      <p class="text-muted-foreground mb-6">Аудит финансов за 2 недели: разберём, как в бизнесе собираются цифры, и соберём ключевой отчёт, которого у вас нет.</p>
       <div class="flex flex-col sm:flex-row gap-3 justify-center">
         <button data-open="quiz" class="inline-flex items-center justify-center gap-2 rounded-md text-base font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-8 shadow-lg shadow-primary/25">Записаться на аудит{{ icon('arrow-right','ml-1 h-5 w-5') }}</button>
         <a href="{{ site.telegram }}" class="inline-flex items-center justify-center gap-2 rounded-md text-base font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-12 px-8">Написать в Telegram</a>
