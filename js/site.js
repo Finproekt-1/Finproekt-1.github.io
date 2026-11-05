@@ -114,7 +114,34 @@
   function validPhone(v) { return /^\+7\d{10}$/.test(v.replace(/[\s\-()]/g, '')); }
   $$('input[type=tel]').forEach(function (i) { i.addEventListener('input', function () { if (i.value.length > 1) i.value = normPhone(i.value); }); });
 
+  /* ---------- источник визита (первый вход) ---------- */
+  var SRC = (function () {
+    var k = 'fp_src', v = null;
+    try { v = JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) {}
+    var p = new URLSearchParams(location.search), ref = '';
+    try { ref = document.referrer ? new URL(document.referrer).hostname.replace(/^www\./, '') : ''; } catch (e) {}
+    if (ref === location.hostname.replace(/^www\./, '')) ref = '';
+    var utm = p.get('utm_source') || p.get('from') || '';
+    if (!v || (utm && !v.s)) {
+      var ch = utm ? utm
+        : /yandex\.|ya\.ru/.test(ref) ? 'Поиск Яндекс' : /google\./.test(ref) ? 'Поиск Google'
+        : /t\.me|telegram/.test(ref) ? 'Telegram' : /vk\.com|vk\.ru/.test(ref) ? 'ВКонтакте'
+        : /instagram|facebook/.test(ref) ? 'Instagram/Facebook' : ref ? 'Сайт: ' + ref : 'Прямой заход';
+      v = { s: utm, channel: ch, m: p.get('utm_medium') || '', c: p.get('utm_campaign') || '', ref: ref, land: location.pathname, d: new Date().toISOString().slice(0, 10) };
+      try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {}
+    }
+    return v;
+  })();
+  function logLead(data) {
+    if (!FP.booking) return;
+    try {
+      var body = JSON.stringify({ action: 'lead', name: data.name, phone: data.phone, source: data.source, tariff: data.tariff || '', niche: data.niche || '', team_size: data.team_size || '', tasks: (data.tasks || []).join('; '), page: location.pathname, src: SRC });
+      fetch(FP.booking, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: body, keepalive: true }).catch(function () {});
+    } catch (e) {}
+  }
   function sendLead(data) {
+    data.tasks = (data.tasks || []).concat(['Откуда: ' + SRC.channel + (SRC.c ? ' / ' + SRC.c : '') + '; вход: ' + SRC.land + '; заявка: ' + location.pathname]);
+    logLead(data);
     var h = { apikey: FP.key, Authorization: 'Bearer ' + FP.key, 'Content-Type': 'application/json', Prefer: 'return=minimal' };
     var row = { name: data.name, phone: data.phone, email: data.email || null, source: data.source, tariff: data.tariff || null, niche: data.niche || null, team_size: data.team_size || null, tasks: data.tasks || null };
     var p1 = fetch(FP.supabase + '/rest/v1/leads', { method: 'POST', headers: h, body: JSON.stringify(row) });
