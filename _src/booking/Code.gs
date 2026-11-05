@@ -22,6 +22,7 @@ var CFG = {
   ZOOM_LINK: '',                    // постоянная ссылка Zoom (если пусто — ссылку пришлём отдельно)
   EXTRA_CALENDARS: ['olga.glavnoe@gmail.com'],  // доп. календари, занятость в которых тоже учитывается
   INVITE_EXTRA: true,               // приглашать доп. календари на встречу (чтобы запись была видна и там)
+  LEADS_SHEET_ID: '1v0VNZxWazkyeotblPkx2wjV3RPZMJqHO8z7fXGFODkQ',  // таблица «заявки с сайта и источники»
   NOTIFY_EMAIL: '',                 // куда слать письмо о новой записи (пусто — на почту владельца)
   TITLE: 'Консультация ФинПроект-1'
 };
@@ -36,6 +37,7 @@ function doPost(e) {
   var lock = LockService.getScriptLock(); lock.waitLock(20000);
   try {
     var d = JSON.parse(e.postData.contents || '{}');
+    if (d.action === 'lead') { logLead_(d); return json_({ ok: true }); }
     if (d.action !== 'book') return json_({ ok: false, error: 'unknown action' });
     var start = new Date(d.start);
     if (isNaN(start) || !d.name || !d.phone) return json_({ ok: false, error: 'bad request' });
@@ -59,10 +61,35 @@ function doPost(e) {
                Utilities.formatDate(start, CFG.OWNER_TZ, 'HH:mm') + ' по Китаю)';
     MailApp.sendEmail(CFG.NOTIFY_EMAIL || Session.getEffectiveUser().getEmail(),
       'Новая запись на консультацию: ' + clean_(d.name) + ', ' + when, desc + '\n\nВремя: ' + when);
+    try { markBooked_(d.phone, Utilities.formatDate(start, CFG.CLIENT_TZ, 'dd.MM.yyyy HH:mm')); } catch (x) {}
     return json_({ ok: true, when: Utilities.formatDate(start, CFG.CLIENT_TZ, 'dd.MM HH:mm'), zoom: !!CFG.ZOOM_LINK });
   } catch (err) {
     return json_({ ok: false, error: String(err) });
   } finally { lock.releaseLock(); }
+}
+
+/* ---------- журнал заявок ---------- */
+function leadsSheet_() { return SpreadsheetApp.openById(CFG.LEADS_SHEET_ID).getSheetByName('Заявки'); }
+function logLead_(d) {
+  var now = new Date();
+  var dow = Number(Utilities.formatDate(now, CFG.CLIENT_TZ, 'u'));          // 1=пн
+  var monday = new Date(now.getTime() - (dow - 1) * 864e5);
+  var t = String(d.team_size || '');
+  var target = !t ? 'не указан' : (/^(до 5M|5-20M|20-50M)$/.test(t) ? 'да' : 'нет');
+  var src = d.src || {};
+  leadsSheet_().appendRow([
+    Utilities.formatDate(now, CFG.CLIENT_TZ, 'dd.MM.yyyy HH:mm'), Utilities.formatDate(monday, CFG.CLIENT_TZ, 'yyyy-MM-dd'),
+    clean_(d.name || ''), "'" + clean_(d.phone || ''), clean_(d.source || ''), clean_(d.tariff || ''), clean_(d.niche || ''),
+    clean_(t), target, clean_(d.tasks || ''), clean_(d.page || ''),
+    clean_(src.channel || ''), clean_(src.m || ''), clean_(src.c || ''), clean_(src.land || ''), clean_(src.ref || ''), 'нет', ''
+  ]);
+}
+function markBooked_(phone, when) {
+  var sh = leadsSheet_(), n = sh.getLastRow(); if (n < 2) return;
+  var vals = sh.getRange(2, 4, n - 1, 1).getValues(), p = String(phone).replace(/\D/g, '');
+  for (var i = vals.length - 1; i >= 0; i--) {
+    if (String(vals[i][0]).replace(/\D/g, '') === p) { sh.getRange(i + 2, 17, 1, 2).setValues([['да', when]]); return; }
+  }
 }
 
 /* ---------- свободные окна ---------- */
