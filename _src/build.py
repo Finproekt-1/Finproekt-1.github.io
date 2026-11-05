@@ -51,12 +51,19 @@ ORG = {
 pages = []  # (path, lastmod)
 
 
+CONSENT_RE = re.compile(r'<p class="[^"]*">Нажимая кнопку, вы соглашаетесь с <a href="/privacy"[^>]*>политикой обработки персональных данных</a></p>')
+CONSENT_HTML = ('<label class="fp-consent"><input type="checkbox" name="pd_consent" required>'
+                '<span>Даю <a href="/soglasie" target="_blank">согласие на обработку персональных данных</a> '
+                'и подтверждаю, что ознакомлен(а) с <a href="/privacy" target="_blank">политикой обработки персональных данных</a></span></label>')
+
+
 def write(path, content_html, title, description, jsonld=None, og_type='website', image=None, lastmod=None, robots=None, sitemap=True):
     if path not in ('/', '/404.html') and not path.endswith('/'):
         path = path + '/'
     page = dict(path=path, title=title, description=description, jsonld=jsonld or [], og_type=og_type, image=image, robots=robots)
     out = env.get_template('base.html').render(page=page, header=Markup(HEADER), footer=Markup(FOOTER), content=Markup(content_html), ver=VER)
-    out = re.sub(r'href="(/(?:blog|baza-znanij|cases|privacy|terms|audit|finotdel|cfo|marketplejsy|upravlencheskij-uchet|zapis|diagnostika)(?:/[\w%-]+)?)(#[^"]*)?"', lambda m: f'href="{m.group(1)}/{m.group(2) or ""}"', out)
+    out = CONSENT_RE.sub(CONSENT_HTML, out)
+    out = re.sub(r'href="(/(?:blog|baza-znanij|cases|privacy|terms|soglasie|audit|finotdel|cfo|marketplejsy|upravlencheskij-uchet|zapis|diagnostika)(?:/[\w%-]+)?)(#[^"]*)?"', lambda m: f'href="{m.group(1)}/{m.group(2) or ""}"', out)
     fp = DIST + (path if path.endswith('.html') else (path.rstrip('/') + '/index.html'))
     os.makedirs(os.path.dirname(fp), exist_ok=True)
     open(fp, 'w').write(out)
@@ -191,7 +198,8 @@ def build():
               jsonld=jl, robots='noindex, nofollow' if sp.get('draft') else None, sitemap=not sp.get('draft'))
 
     # --- legal
-    write('/privacy', partial('privacy_main.html'), 'Политика конфиденциальности — ФинПроект-1', 'Политика обработки и защиты персональных данных пользователей сайта ФинПроект-1.', lastmod='2026-03-12')
+    write('/privacy', env.get_template('legal_privacy.html').render(), 'Политика обработки персональных данных — ФинПроект-1', 'Политика обработки персональных данных сайта ФинПроект-1: какие данные собираем, зачем, кому передаём, cookie и Яндекс Метрика, ваши права.', lastmod='2026-11-05')
+    write('/soglasie', env.get_template('legal_consent.html').render(), 'Согласие на обработку персональных данных — ФинПроект-1', 'Текст согласия на обработку персональных данных при отправке заявки на сайте ФинПроект-1.', lastmod='2026-11-05')
     write('/terms', partial('terms_main.html'), 'Условия использования — ФинПроект-1', 'Пользовательское соглашение сайта ФинПроект-1.', lastmod='2026-03-12')
     write('/404.html', '<section class="pt-36 pb-24 text-center"><div class="container mx-auto px-4"><h1 class="text-5xl font-black text-foreground mb-4">404</h1><p class="text-muted-foreground mb-8">Такой страницы нет. Возможно, она переехала.</p><a href="/" class="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground h-11 px-8 font-medium">На главную</a></div></section>',
           'Страница не найдена — ФинПроект-1', 'Страница не найдена.', robots='noindex, follow', sitemap=False)

@@ -35,6 +35,7 @@
     <input name="role" class="{{ inputcls }}" placeholder="Должность">
     <input name="niche" class="{{ inputcls }}" placeholder="Ниша">
     <textarea name="text" required rows="5" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm" placeholder="Текст отзыва *"></textarea>
+    <label class="fp-consent"><input type="checkbox" name="pd_consent" required><span>Даю <a href="/soglasie/" target="_blank">согласие на обработку</a> и публикацию на сайте моего имени, должности, ниши и текста отзыва</span></label>
     <button type="submit" class="{{ btncls }} w-full h-12">Отправить отзыв</button>
   </form>
   <button type="button" data-close class="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100">{{ icon('x','h-4 w-4') }}<span class="sr-only">Закрыть</span></button>

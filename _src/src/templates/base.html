@@ -18,9 +18,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.ico">
 <link rel="alternate" type="application/rss+xml" title="ФинПроект-1 — Блог" href="{{ site.url }}/rss.xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/inter-400.woff" as="font" type="font/woff" crossorigin>
+<style>{% for w in [400,500,600,700,800,900] %}@font-face{font-family:'Inter';font-style:normal;font-weight:{{ w }};font-display:swap;src:url(/fonts/inter-{{ w }}.woff) format('woff')}{% endfor %}</style>
 <link rel="stylesheet" href="/css/base.css?v={{ ver }}">
 <link rel="stylesheet" href="/css/custom.css?v={{ ver }}">
 {% for ld in page.jsonld %}<script type="application/ld+json">{{ ld | tojson }}</script>
@@ -38,7 +37,9 @@
 <div data-toast class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] rounded-lg border border-border bg-background px-4 py-3 text-sm shadow-lg"></div>
 <script>window.FP={supabase:"{{ site.backend.supabase_url }}",key:"{{ site.backend.anon_key }}",chat:"{{ site.backend.chat_url }}",booking:"{{ site.backend.booking_url }}",quiz:{{ site.quiz | tojson }}};</script>
 <script src="/js/site.js?v={{ ver }}" defer></script>
-<script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");ym({{ site.metrika }},"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});</script>
-<noscript><div><img src="https://mc.yandex.ru/watch/{{ site.metrika }}" style="position:absolute;left:-9999px" alt=""></div></noscript>
+<div data-cookie class="fp-cookie" hidden role="dialog" aria-label="Использование cookie"><p>Мы используем cookie и сервис веб-аналитики Яндекс Метрика (ООО «Яндекс»), чтобы понимать, как посетители пользуются сайтом. Метрика включится только с вашего согласия. <a href="/privacy#cookie">Подробнее</a></p><div><button type="button" data-cookie-yes class="fp-btn">Принять</button><button type="button" data-cookie-no class="fp-btn-o">Отказаться</button></div></div>
+<script>window.ym=window.ym||function(){(ym.a=ym.a||[]).push(arguments)};ym.l=1*new Date();ym({{ site.metrika }},"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});
+window.fpMetrika=function(){if(window.__fpM)return;window.__fpM=1;var k=document.createElement('script');k.async=1;k.src='https://mc.yandex.ru/metrika/tag.js';document.head.appendChild(k)};
+(function(){var c=null;try{c=localStorage.getItem('fp_cookie')}catch(e){}if(c==='yes')fpMetrika();else if(c!=='no')document.addEventListener('DOMContentLoaded',function(){var b=document.querySelector('[data-cookie]');if(b)b.hidden=false})})();</script>
 </body>
 </html>

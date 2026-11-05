@@ -155,6 +155,7 @@
       e.preventDefault();
       var name = f.name.value.trim(), phone = normPhone(f.phone.value);
       if (!name || !validPhone(phone)) { toast('Заполните имя и корректный телефон (+7XXXXXXXXXX)', true); return; }
+      if (f.pd_consent && !f.pd_consent.checked) { toast('Отметьте согласие на обработку персональных данных', true); return; }
       var btn = $('[type=submit]', f); if (btn) btn.disabled = true;
       var data = { name: name, phone: phone, source: f.getAttribute('data-lead-form') };
       if (f.tariff) data.tariff = f.tariff.value;
@@ -176,6 +177,7 @@
   var rf = $('[data-review-form]');
   if (rf) rf.addEventListener('submit', function (e) {
     e.preventDefault();
+    if (rf.pd_consent && !rf.pd_consent.checked) { toast('Отметьте согласие на публикацию отзыва', true); return; }
     var h = { apikey: FP.key, Authorization: 'Bearer ' + FP.key, 'Content-Type': 'application/json', Prefer: 'return=minimal' };
     var row = { name: rf.name.value.trim(), role: rf.role.value.trim() || null, niche: rf.niche.value.trim() || null, text: rf.text.value.trim(), rating: 5, approved: false };
     fetch(FP.supabase + '/rest/v1/reviews', { method: 'POST', headers: h, body: JSON.stringify(row) })
@@ -268,7 +270,7 @@
         '<input class="flex w-full rounded-md border border-input px-3 py-2 text-base md:text-sm h-12 bg-background" name="name" required placeholder="Ваше имя">' +
         '<input type="tel" name="phone" required class="flex w-full rounded-md border border-input px-3 py-2 text-base md:text-sm h-12 bg-background" placeholder="+7XXXXXXXXXX">' +
         '<button class="fp-btn" style="width:100%">Выбрать время разбора</button>' +
-        '<p class="text-xs text-muted-foreground text-center">Нажимая кнопку, вы соглашаетесь с <a href="/privacy" class="text-primary hover:underline">политикой обработки персональных данных</a></p></form>' +
+        '<label class="fp-consent"><input type="checkbox" name="pd_consent" required><span>Даю <a href="/soglasie/" target="_blank">согласие на обработку персональных данных</a> и подтверждаю, что ознакомлен(а) с <a href="/privacy/" target="_blank">политикой обработки персональных данных</a></span></label></form>' +
         '<div data-diag-booking></div></div><button type="button" data-restart class="fp-diag-back">Пройти заново</button></div>';
       bindLeadForm($('[data-lead-form]', root));
       $('[data-restart]', root).addEventListener('click', function () { ans = []; i = 0; q(); });
@@ -281,8 +283,8 @@
   var steps = ['Ниша', 'Оборот', 'Задачи', 'Контакты'];
   var optCls = 'text-left text-sm px-3 py-2.5 rounded-lg border transition-all ';
   var on = 'border-primary bg-primary/10 text-foreground font-medium', off = 'border-border bg-background text-muted-foreground hover:border-primary/30';
-  function quizReset() { qs = { niche: '', turnover: '', tasks: [], name: '', phone: '' }; qStep = 0; renderQuiz(); }
-  function canNext() { return qStep === 0 ? !!qs.niche : qStep === 1 ? !!qs.turnover : qStep === 2 ? qs.tasks.length > 0 : (!!qs.name.trim() && validPhone(qs.phone)); }
+  function quizReset() { qs = { niche: '', turnover: '', tasks: [], name: '', phone: '', consent: false }; qStep = 0; renderQuiz(); }
+  function canNext() { return qStep === 0 ? !!qs.niche : qStep === 1 ? !!qs.turnover : qStep === 2 ? qs.tasks.length > 0 : (!!qs.name.trim() && validPhone(qs.phone) && qs.consent); }
   function renderQuiz(done) {
     var body = $('[data-quiz-body]'); if (!body) return;
     if (done) { bookingFlow(body, done); return; }
@@ -290,7 +292,7 @@
     if (qStep === 0) h += '<p class="text-sm text-muted-foreground mb-3">В какой нише ваш бизнес?</p><div class="grid grid-cols-2 gap-2">' + Q.niches.map(function (n) { return '<button type="button" data-q="niche" data-v="' + esc(n) + '" class="' + optCls + (qs.niche === n ? on : off) + '">' + esc(n) + '</button>'; }).join('') + '</div>';
     if (qStep === 1) h += '<p class="text-sm text-muted-foreground mb-3">Какой оборот вашего бизнеса?</p><div class="space-y-2">' + Q.turnover.map(function (t) { return '<button type="button" data-q="turnover" data-v="' + esc(t[1]) + '" class="w-full px-4 py-3 ' + optCls + (qs.turnover === t[1] ? on : off) + '">' + esc(t[0]) + '</button>'; }).join('') + '</div>';
     if (qStep === 2) h += '<p class="text-sm text-muted-foreground mb-3">Какие задачи нужно решить? (можно выбрать несколько)</p><div class="space-y-2">' + Q.tasks.map(function (t) { var s = qs.tasks.indexOf(t) >= 0; return '<button type="button" data-q="tasks" data-v="' + esc(t) + '" class="w-full px-4 py-3 ' + optCls + (s ? on : off) + '">' + (s ? '✓ ' : '') + esc(t) + '</button>'; }).join('') + '</div>';
-    if (qStep === 3) h += '<div class="space-y-4"><p class="text-sm text-muted-foreground mb-1">Оставьте контакты — мы проведём бесплатную консультацию</p><ol class="fp-next fp-next-sm"><li><b>1</b><span>Свяжемся и уточним задачу</span></li><li><b>2</b><span>Видеозвонок с финансовым специалистом</span></li><li><b>3</b><span>Предложим формат работы и стоимость</span></li></ol><input data-qf="name" value="' + esc(qs.name) + '" placeholder="Ваше имя" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm h-12 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><input data-qf="phone" type="tel" value="' + esc(qs.phone) + '" placeholder="+7XXXXXXXXXX" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm h-12 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><p class="text-xs text-muted-foreground">Нажимая кнопку, вы соглашаетесь с <a href="/privacy" class="text-primary hover:underline">политикой обработки персональных данных</a></p></div>';
+    if (qStep === 3) h += '<div class="space-y-4"><p class="text-sm text-muted-foreground mb-1">Оставьте контакты — мы проведём бесплатную консультацию</p><ol class="fp-next fp-next-sm"><li><b>1</b><span>Свяжемся и уточним задачу</span></li><li><b>2</b><span>Видеозвонок с финансовым специалистом</span></li><li><b>3</b><span>Предложим формат работы и стоимость</span></li></ol><input data-qf="name" value="' + esc(qs.name) + '" placeholder="Ваше имя" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm h-12 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><input data-qf="phone" type="tel" value="' + esc(qs.phone) + '" placeholder="+7XXXXXXXXXX" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm h-12 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><label class="fp-consent"><input type="checkbox" data-qc' + (qs.consent ? ' checked' : '') + '><span>Даю <a href="/soglasie/" target="_blank">согласие на обработку персональных данных</a> и подтверждаю, что ознакомлен(а) с <a href="/privacy/" target="_blank">политикой обработки персональных данных</a></span></label></div>';
     h += '<div class="flex gap-3 mt-4">' + (qStep > 0 ? '<button type="button" data-q-back class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4">← Назад</button>' : '') +
       '<button type="button" data-q-next ' + (canNext() ? '' : 'disabled') + ' class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 disabled:opacity-50 disabled:pointer-events-none shadow-lg shadow-primary/25">' + (qStep < 3 ? 'Далее →' : 'Получить консультацию') + '</button></div>';
     body.innerHTML = h;
@@ -307,6 +309,7 @@
         qs[k] = i.value; $('[data-q-next]', body).disabled = !canNext();
       });
     });
+    var qc = $('[data-qc]', body); if (qc) qc.addEventListener('change', function () { qs.consent = qc.checked; $('[data-q-next]', body).disabled = !canNext(); });
     var back = $('[data-q-back]', body); if (back) back.addEventListener('click', function () { qStep--; renderQuiz(); });
     $('[data-q-next]', body).addEventListener('click', function () {
       if (!canNext()) return;
@@ -383,6 +386,8 @@
   }
   function say(text) {
     text = (text || '').trim(); if (!text || busy) return;
+    var cc = $('[data-chat-consent]'); if (cc && !cc.checked) { toast('Отметьте согласие на обработку персональных данных', true); cc.focus(); return; }
+    var cw = $('[data-chat-consent-wrap]'); if (cw) cw.style.display = 'none';
     if (msgs.length >= 40) { msgs.push({ role: 'user', content: text }, { role: 'assistant', content: 'Мы уже долго общаемся! 😊 Для более детальной консультации позвоните нам по телефону **+7-927-424-78-78** или напишите в [Telegram](https://t.me/OlgaOFinansah).\n\n:::buttons\n📝 Оставить заявку\n:::' }); render(); return; }
     msgs.push({ role: 'user', content: text }); busy = true; render(); goal('chat_message');
     var payload = msgs.slice(1).map(function (m) { return { role: m.role, content: m.content }; });
@@ -436,4 +441,13 @@
   var bar = document.querySelector('[data-mbar]'); if (!bar) return;
   var onScroll = function () { var show = window.scrollY > 560; bar.classList.toggle('fp-mbar-on', show); document.body.classList.toggle('fp-mbar-shown', show); };
   window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+})();
+
+/* ---------- cookie / Яндекс Метрика: только с согласия ---------- */
+(function () {
+  var b = document.querySelector('[data-cookie]'); if (!b) return;
+  function set(v) { try { localStorage.setItem('fp_cookie', v); } catch (e) {} b.hidden = true; }
+  b.querySelector('[data-cookie-yes]').addEventListener('click', function () { set('yes'); if (window.fpMetrika) window.fpMetrika(); });
+  b.querySelector('[data-cookie-no]').addEventListener('click', function () { set('no'); });
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-cookie-settings]')) { e.preventDefault(); b.hidden = false; } });
 })();

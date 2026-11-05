@@ -10,6 +10,7 @@
     <button data-chat-close class="text-primary-foreground/80 hover:text-primary-foreground" aria-label="Закрыть чат">{{ icon('x','h-5 w-5') }}</button>
   </div>
   <div data-chat-log class="flex-1 overflow-y-auto px-4 py-3 space-y-3"></div>
+  <label class="fp-consent fp-chat-consent" data-chat-consent-wrap><input type="checkbox" data-chat-consent><span>Даю <a href="/soglasie/" target="_blank">согласие на обработку персональных данных</a> и подтверждаю, что ознакомлен(а) с <a href="/privacy/" target="_blank">политикой обработки персональных данных</a></span></label>
   <form data-chat-form class="flex items-end gap-2 border-t border-border px-3 py-3">
     <textarea data-chat-input placeholder="Напишите сообщение..." rows="1" class="flex-1 resize-none rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring"></textarea>
     <button type="submit" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40" aria-label="Отправить">{{ icon('send','h-4 w-4') }}</button>
