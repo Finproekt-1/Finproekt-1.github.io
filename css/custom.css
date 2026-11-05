@@ -161,3 +161,26 @@
 .fp-zapis-svc a{font-size:.85rem;padding:6px 12px;border-radius:999px;border:1px solid hsl(var(--border));color:hsl(var(--muted-foreground));background:hsl(var(--background))}
 .fp-zapis-svc a:hover{border-color:hsl(var(--primary)/.5);color:hsl(var(--primary))}
 [data-zapis-booking]{scroll-margin-top:90px}
+/* diagnostics */
+.fp-diag-wrap{max-width:760px;margin:0 auto;text-align:center}
+.fp-diag-wrap .fp-svc-lead{margin-left:auto;margin-right:auto}
+.fp-diag{margin-top:32px;text-align:left}
+.fp-diag-card{background:hsl(var(--background));border:1px solid hsl(var(--border));border-radius:20px;padding:28px;box-shadow:0 20px 50px -30px hsl(var(--primary)/.45)}
+@media (min-width:768px){.fp-diag-card{padding:40px}}
+.fp-diag-prog{height:6px;background:hsl(var(--muted));border-radius:999px;overflow:hidden;margin-bottom:20px}
+.fp-diag-prog span{display:block;height:100%;background:hsl(var(--primary));transition:width .3s}
+.fp-diag-num{font-size:.8rem;color:hsl(var(--muted-foreground));font-weight:600}
+.fp-diag-q{font-size:1.45rem;line-height:1.25;font-weight:800;color:hsl(var(--foreground));margin-top:8px}
+.fp-diag-hint{margin-top:10px;color:hsl(var(--muted-foreground));line-height:1.55}
+.fp-diag-btns{display:grid;gap:12px;margin-top:28px}
+@media (min-width:600px){.fp-diag-btns{grid-template-columns:1fr 1fr}}
+.fp-diag-back{margin-top:16px;font-size:.88rem;color:hsl(var(--muted-foreground))}
+.fp-diag-back:hover{color:hsl(var(--primary))}
+.fp-diag-zone{display:inline-flex;align-items:baseline;gap:12px;padding:10px 18px;border-radius:999px;font-weight:700}
+.fp-diag-zone b{font-size:1.6rem}
+.fp-z-green{background:#dcfce7;color:#166534}.fp-z-yellow{background:#fef3c7;color:#92400e}.fp-z-red{background:#fee2e2;color:#991b1b}
+.fp-diag-sub{margin-top:22px;font-weight:700;color:hsl(var(--foreground))}
+.fp-diag-weak{margin:10px 0 0;padding-left:20px;display:grid;gap:8px;color:hsl(var(--foreground));line-height:1.5;list-style:disc}
+.fp-diag-cta{margin-top:28px;padding-top:24px;border-top:1px solid hsl(var(--border))}
+.fp-diag-cta form{margin-top:16px}
+[data-diag-booking]{scroll-margin-top:90px}
