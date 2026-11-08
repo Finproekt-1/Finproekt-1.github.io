@@ -11,7 +11,7 @@
   "default_title": "Финансовый аутсорсинг для бизнеса — финдиректор и управленческий учёт | ФинПроект-1",
   "default_description": "Финансовый аутсорсинг для малого и среднего бизнеса: услуги финансового директора, постановка управленческого учёта, ДДС, ОПиУ и баланс. Команда из 4 специалистов по цене одного штатного сотрудника. Аудит финансов за 2 недели.",
   "og_image": "/img/og-image.jpg",
-  "legal": {"operator": "ООО «ФинАссистент»", "inn": "", "ogrn": "", "address": "", "email": "finproekt-1@yandex.ru", "updated": "05.11.2026"},
+  "legal": {"operator": "ООО «ФинАссистент»", "inn": "7730330029", "ogrn": "1247700706582", "address": "121596, г. Москва, ул. Горбунова, д. 2, стр. 3, помещ. 33/8", "email": "finproekt-1@yandex.ru", "updated": "08.11.2026"},
   "backend": {
     "supabase_url": "https://gxcxmyxodlqleuvviofd.supabase.co",
     "anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4Y3hteXhvZGxxbGV1dnZpb2ZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNTU1NTUsImV4cCI6MjA4ODczMTU1NX0.CvS_zHk2r0QI66Yf7J8KRscKOl5B3JjUTgOdnK0j19I",
